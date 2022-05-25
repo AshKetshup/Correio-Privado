@@ -4,6 +4,7 @@ import lombok.*;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 
 import java.sql.Date;
@@ -17,7 +18,7 @@ import static javax.persistence.GenerationType.AUTO;
 @RequiredArgsConstructor
 public class News {
     @Id
-    @GeneratedValue(strategy = AUTO)
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NonNull
     private String title;

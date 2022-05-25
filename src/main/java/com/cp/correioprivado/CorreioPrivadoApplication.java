@@ -39,10 +39,10 @@ public class CorreioPrivadoApplication {
             userService.saveRole(new Role( "ROLE_MANAGER","Manager"));
             userService.saveRole(new Role( "ROLE_OFFICER","Officer"));
 
-            userService.saveUser(new User("Fernando Fonseca","fernando","fernando@fonseca.pt","1234"));
-            userService.saveUser(new User("Ezequiel Barbosa","barbosa","ezequielbarbosa@valadas.pt","1234"));
-            userService.saveUser(new User("Jacinto Meireles","meireles","jacinto@meireles.pt","1234"));
-            userService.saveUser(new User("José Lopes da Silva","lopesdasilva","jose@lopesdasilva.pt","1234"));
+            userService.saveUser(new User("Fernando Fonseca","fernando","fernando@fonseca.pt","1234", roleRepo.findByName("ROLE_USER").getId()));
+            userService.saveUser(new User("Ezequiel Barbosa","barbosa","ezequielbarbosa@valadas.pt","1234", roleRepo.findByName("ROLE_ADMIN").getId()));
+            userService.saveUser(new User("Jacinto Meireles","meireles","jacinto@meireles.pt","1234", roleRepo.findByName("ROLE_MANAGER").getId()));
+            userService.saveUser(new User("José Lopes da Silva","lopesdasilva","jose@lopesdasilva.pt","1234", roleRepo.findByName("ROLE_OFFICER").getId()));
 
             userService.addRoleToUser("fernando","ROLE_OFFICER");
             userService.addRoleToUser("meireles","ROLE_USER");

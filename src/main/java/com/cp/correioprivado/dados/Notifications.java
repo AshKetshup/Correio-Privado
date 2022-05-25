@@ -7,9 +7,8 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
-
-import static javax.persistence.GenerationType.AUTO;
 
 @Entity
 @Data
@@ -17,10 +16,10 @@ import static javax.persistence.GenerationType.AUTO;
 @AllArgsConstructor
 public class Notifications {
     @Id
-    @GeneratedValue(strategy = AUTO)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private Long id;
     private String message;
     private String is_read;
-    private String news_id;
-    private String user_id;
+    private Long news_id;
+    private Long user_id;
 }

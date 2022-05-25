@@ -1,13 +1,7 @@
 package com.cp.correioprivado.service;
 
-import com.cp.correioprivado.dados.News;
-import com.cp.correioprivado.dados.Role;
-import com.cp.correioprivado.dados.Topic;
-import com.cp.correioprivado.dados.User;
-import com.cp.correioprivado.repo.NewsRepo;
-import com.cp.correioprivado.repo.RoleRepo;
-import com.cp.correioprivado.repo.TopicRepo;
-import com.cp.correioprivado.repo.UserRepo;
+import com.cp.correioprivado.dados.*;
+import com.cp.correioprivado.repo.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -21,6 +15,8 @@ public class UserServiceImplementation implements UserService{
     private final RoleRepo roleRepo;
     private final NewsRepo newsRepo;
     private final TopicRepo topicRepo;
+
+    private final TopicSubscribedRepo topicSubscribedRepo;
     @Override
     public User saveUser(User user) {
         log.info("Saving new user {} to the database!", user.getName());
@@ -54,15 +50,31 @@ public class UserServiceImplementation implements UserService{
     }
 
     @Override
+    public Topic_Subscribed subscribeTopic(String username, String title){
+        User user = userRepo.findByUsername(username);
+        Topic topic = topicRepo.findByTitle(title);
+        Topic_Subscribed topic_subscribed = new Topic_Subscribed(user.getId(),topic.getId());
+        log.info("Subscribing topic {} to user {}!", topic.getTitle(), user.getName());
+        return topicSubscribedRepo.save(topic_subscribed);
+    }
+
+    @Override
     public User getUser(String username) {
         log.info("Getting user {}!",username);
         return userRepo.findByUsername(username);
     }
 
     @Override
-    public News getNews(String title) {
-        log.info("Getting news {}|", title);
+    public News getNewsByTitle(String title) {
+        log.info("Getting news {}!", title);
         return newsRepo.findByTitle(title);
+    }
+
+    @Override
+    public News getNewsByTopic(String topic) {
+        log.info("Getting news {}!", topic);
+        Topic topic1 = topicRepo.findByTitle(topic);
+        return newsRepo.findByTopic_id(topic1.getId());
     }
 
     @Override
@@ -83,5 +95,13 @@ public class UserServiceImplementation implements UserService{
     @Override
     public List<News> getNews() {
         return newsRepo.findAll();
+    }
+    
+    @Override
+    public void removeTopicSubscribed(String username, String title){
+        User user = userRepo.findByUsername(username);
+        Topic topic = topicRepo.findByTitle(title);
+        Topic_Subscribed topicSubscribed = topicSubscribedRepo.findByTopic_idAndUser_id(topic.getId(), user.getId());
+        topicSubscribedRepo.delete(topicSubscribed);
     }
 }

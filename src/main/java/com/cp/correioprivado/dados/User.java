@@ -5,15 +5,12 @@ import lombok.*;
 import javax.persistence.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import static javax.persistence.FetchType.EAGER;
-import static javax.persistence.GenerationType.AUTO;
 
 @Entity @Data @NoArgsConstructor @AllArgsConstructor @RequiredArgsConstructor
+@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"id","username", "email"})})
 public class User {
-    @Id @GeneratedValue(strategy = AUTO)
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NonNull
     private String name;
@@ -22,10 +19,9 @@ public class User {
     @NonNull
     private String email;
     @NonNull
-    private String password;
-    private String salt;
+    private String password; // password can be salted with BCryptPasswordEncoder
+    @NonNull
     private Long role_id;
-    @ManyToMany(fetch = EAGER)
-    private Collection<Role> roles = new ArrayList<>();
-
+    @OneToOne(mappedBy = "user")
+    private Role role;
 }
