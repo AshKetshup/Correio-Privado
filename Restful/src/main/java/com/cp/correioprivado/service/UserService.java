@@ -1,23 +1,35 @@
 package com.cp.correioprivado.service;
 
-import com.cp.correioprivado.dados.News;
-import com.cp.correioprivado.dados.Role;
-import com.cp.correioprivado.dados.Topic;
-import com.cp.correioprivado.dados.User;
+import com.cp.correioprivado.dados.*;
 
 import java.util.List;
 
 public interface UserService {
+
+    // USER
     User saveUser(User user);
-    Role saveRole(Role role);
-    News saveNews(News news);
-    Topic saveTopic(Topic topic);
-    void addRoleToUser(String username, String name);
-    User getUser(String username);
-    News getNews(String title);
     List<User> getUsers();
+    User getUser(String username);
+    void addRoleToUser(String username, String name);
+
+    // ROLE
+    Role saveRole(Role role);
     List<Role> getRoles();
-    List<Topic> getTopics();
+
+    // NEWS
+    News saveNews(News news);
     List<News> getNews();
+    News getNewsByTitle(String title);
+    News getNewsByTopic(String topic);
+
+    // TOPIC
+    Topic saveTopic(Topic topic);
+    List<Topic> getTopics();
+
+    // TOPIC_SUBSCRIBED
+    Topic_Subscribed subscribeTopic(String username, String topic);
+    void removeTopicSubscribed(String username, String title);
+
+    // NOTIFICATION
 }
 

@@ -1,9 +1,6 @@
 package com.cp.correioprivado.api;
 
-import com.cp.correioprivado.dados.News;
-import com.cp.correioprivado.dados.Role;
-import com.cp.correioprivado.dados.Topic;
-import com.cp.correioprivado.dados.User;
+import com.cp.correioprivado.dados.*;
 import com.cp.correioprivado.service.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -68,11 +65,23 @@ public class UserResource {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/topic/save").toUriString());
         return ResponseEntity.created(uri).body(userService.saveTopic(topic));
     }
+
+    @PostMapping("/topic_subscribed/subscribe")
+    public ResponseEntity<Topic_Subscribed>subscribeTopic(@RequestBody TopicSubscribeForm form){
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/topic_subscribed/subscribe").toUriString());
+        return ResponseEntity.created(uri).body(userService.subscribeTopic(form.getUsername(),form.getTitle()));
+    }
 }
 
 @Data
 class RoleToUserForm {
     private String username;
     private String roleName;
+}
+
+@Data
+class TopicSubscribeForm{
+    private String username;
+    private String title;
 }
 
