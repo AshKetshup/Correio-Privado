@@ -45,7 +45,7 @@ public class UserServiceImplementation implements UserService{
     public void addRoleToUser(String username, String name) {
         User user = userRepo.findByUsername(username);
         Role role = roleRepo.findByName(name);
-        user.setRole_id(role.getId());
+        user.setRoleId(role.getId());
         log.info("Saving adding role {} to user {}!",role.getName(),user.getName());
     }
 
@@ -74,7 +74,7 @@ public class UserServiceImplementation implements UserService{
     public News getNewsByTopic(String topic) {
         log.info("Getting news {}!", topic);
         Topic topic1 = topicRepo.findByTitle(topic);
-        return newsRepo.findByTopic_id(topic1.getId());
+        return newsRepo.findByTopicId(topic1.getId());
     }
 
     @Override
@@ -101,7 +101,7 @@ public class UserServiceImplementation implements UserService{
     public void removeTopicSubscribed(String username, String title){
         User user = userRepo.findByUsername(username);
         Topic topic = topicRepo.findByTitle(title);
-        Topic_Subscribed topicSubscribed = topicSubscribedRepo.findByTopic_idAndUser_id(topic.getId(), user.getId());
+        Topic_Subscribed topicSubscribed = topicSubscribedRepo.findByTopicIdAndUserId(topic.getId(), user.getId());
         topicSubscribedRepo.delete(topicSubscribed);
     }
 }

@@ -21,7 +21,7 @@ public class User {
     @NonNull
     private String password; // password can be salted with BCryptPasswordEncoder
     @NonNull
-    private Long role_id;
-    @OneToOne(mappedBy = "user")
-    private Role role;
+    private Long roleId;
+    /*@OneToOne(mappedBy = "user")
+    private Role role;*/
 }

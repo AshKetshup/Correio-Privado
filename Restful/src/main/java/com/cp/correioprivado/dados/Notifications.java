@@ -19,7 +19,7 @@ public class Notifications {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     private String message;
-    private String is_read;
-    private Long news_id;
-    private Long user_id;
+    private String isRead;
+    private Long newsId;
+    private Long userId;
 }
