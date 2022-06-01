@@ -5,5 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface NewsRepo extends JpaRepository<News,String> {
     News findByTitle(String title);
-    News findByTopic_id(Long topic_id);
+    News findByTopicId(Long topicId);
 }

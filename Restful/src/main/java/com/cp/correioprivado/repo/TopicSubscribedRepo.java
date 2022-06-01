@@ -8,6 +8,6 @@ import java.util.Optional;
 
 public interface TopicSubscribedRepo extends JpaRepository<Topic_Subscribed,Long> {
     Optional<Topic_Subscribed> findById(Long id);
-    Topic_Subscribed findByTopic_idAndUser_id(Long topic_id, Long user_id);
+    Topic_Subscribed findByTopicIdAndUserId(Long topicId, Long userId);
     List<Topic_Subscribed> findByUserId(long id);
 }

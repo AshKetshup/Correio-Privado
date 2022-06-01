@@ -18,7 +18,7 @@ public class Topic_Subscribed {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NonNull
-    private Long user_id;
+    private Long userId;
     @NonNull
-    private Long topic_id;
+    private Long topicId;
 }

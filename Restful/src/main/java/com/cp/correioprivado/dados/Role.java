@@ -14,9 +14,9 @@ public class Role {
     @NonNull
     private String name;
     @NonNull
-    private String description;
+    private String description;/*
     @OneToOne
     @JoinColumn(name = "id")
     @MapsId
-    private User user;
+    private User user;*/
 }

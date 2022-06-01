@@ -27,7 +27,7 @@ public class News {
     @NonNull
     private Date release_date;
     @NonNull
-    private Long user_id;
+    private Long userId;
     @NonNull
-    private Long topic_id;
+    private Long topicId;
 }
