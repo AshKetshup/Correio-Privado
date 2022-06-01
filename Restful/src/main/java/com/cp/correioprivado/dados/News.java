@@ -2,12 +2,10 @@ package com.cp.correioprivado.dados;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 import java.sql.Date;
+import java.util.List;
 
 import static javax.persistence.GenerationType.AUTO;
 
@@ -26,8 +24,10 @@ public class News {
     private String content;
     @NonNull
     private Date release_date;
-    @NonNull
-    private Long userId;
-    @NonNull
-    private Long topicId;
+    @ManyToOne
+    private User user;
+    @ManyToOne
+    private Topic topic;
+    @OneToMany (mappedBy = "news")
+    private List<Notifications> notifications;
 }

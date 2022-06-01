@@ -67,7 +67,7 @@ public class UserResource {
     }
 
     @PostMapping("/topic_subscribed/subscribe")
-    public ResponseEntity<Topic_Subscribed>subscribeTopic(@RequestBody TopicSubscribeForm form){
+    public ResponseEntity<TopicSubscribed>subscribeTopic(@RequestBody TopicSubscribeForm form){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/topic_subscribed/subscribe").toUriString());
         return ResponseEntity.created(uri).body(userService.subscribeTopic(form.getUsername(),form.getTitle()));
     }

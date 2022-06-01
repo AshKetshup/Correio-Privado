@@ -3,22 +3,21 @@ package com.cp.correioprivado.dados;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
-public class Topic_Subscribed {
+public class TopicSubscribed {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NonNull
-    private Long userId;
+    @ManyToOne
+    private User user;
     @NonNull
-    private Long topicId;
+    @ManyToOne
+    private Topic topic;
 }

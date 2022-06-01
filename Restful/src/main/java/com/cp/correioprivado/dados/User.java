@@ -4,7 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
-import java.util.ArrayList;
+import java.util.List;
 
 @Entity @Data @NoArgsConstructor @AllArgsConstructor @RequiredArgsConstructor
 @Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"id","username", "email"})})
@@ -20,8 +20,12 @@ public class User {
     private String email;
     @NonNull
     private String password; // password can be salted with BCryptPasswordEncoder
-    @NonNull
-    private Long roleId;
-    /*@OneToOne(mappedBy = "user")
-    private Role role;*/
+    @ManyToOne
+    private Role role;
+    @OneToMany(mappedBy = "user")
+    private List<TopicSubscribed> topics;
+    @OneToMany(mappedBy = "user")
+    private List <News> news;
+    @OneToMany (mappedBy ="user")
+    private List <Notifications> notifications;
 }

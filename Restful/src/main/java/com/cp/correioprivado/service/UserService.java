@@ -27,7 +27,7 @@ public interface UserService {
     List<Topic> getTopics();
 
     // TOPIC_SUBSCRIBED
-    Topic_Subscribed subscribeTopic(String username, String topic);
+    TopicSubscribed subscribeTopic(String username, String topic);
     void removeTopicSubscribed(String username, String title);
 
     // NOTIFICATION

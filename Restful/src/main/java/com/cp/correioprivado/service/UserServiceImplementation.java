@@ -45,15 +45,15 @@ public class UserServiceImplementation implements UserService{
     public void addRoleToUser(String username, String name) {
         User user = userRepo.findByUsername(username);
         Role role = roleRepo.findByName(name);
-        user.setRoleId(role.getId());
+        //user.setRoleId(role.getId());
         log.info("Saving adding role {} to user {}!",role.getName(),user.getName());
     }
 
     @Override
-    public Topic_Subscribed subscribeTopic(String username, String title){
+    public TopicSubscribed subscribeTopic(String username, String title){
         User user = userRepo.findByUsername(username);
         Topic topic = topicRepo.findByTitle(title);
-        Topic_Subscribed topic_subscribed = new Topic_Subscribed(user.getId(),topic.getId());
+        TopicSubscribed topic_subscribed = new TopicSubscribed(user,topic);
         log.info("Subscribing topic {} to user {}!", topic.getTitle(), user.getName());
         return topicSubscribedRepo.save(topic_subscribed);
     }
@@ -101,7 +101,7 @@ public class UserServiceImplementation implements UserService{
     public void removeTopicSubscribed(String username, String title){
         User user = userRepo.findByUsername(username);
         Topic topic = topicRepo.findByTitle(title);
-        Topic_Subscribed topicSubscribed = topicSubscribedRepo.findByTopicIdAndUserId(topic.getId(), user.getId());
+        TopicSubscribed topicSubscribed = topicSubscribedRepo.findByTopicIdAndUserId(topic.getId(), user.getId());
         topicSubscribedRepo.delete(topicSubscribed);
     }
 }
