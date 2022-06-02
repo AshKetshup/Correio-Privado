@@ -93,6 +93,11 @@ public class UserServiceImplementation implements UserService{
     }
 
     @Override
+    public Role getRoleByUser(String username) {
+        return userRepo.findByUsername(username).getRole();
+    }
+
+    @Override
     public List<Topic> getTopics() {
         return topicRepo.findAll();
     }
