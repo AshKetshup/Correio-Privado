@@ -14,6 +14,7 @@ public interface UserService {
     // ROLE
     Role saveRole(Role role);
     List<Role> getRoles();
+    Role getRoleByUser(String username);
 
     // NEWS
     News saveNews(News news);
