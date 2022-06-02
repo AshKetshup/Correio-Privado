@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Hello, world!</title>
+    <title>Correio Privado - Register</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -48,6 +48,7 @@
             <img src="https://mdbootstrap.com/img/new/fluid/city/018.jpg" class="vh-100 w-100" alt="Background Image" style="object-fit: cover">
             <div class="mask" style="background-color: rgba(0, 0, 0, 0.65);">
                 <div class="vh-100 ">
+
                     <nav class="container navbar navbar-expand-lg navbar-dark shadow-0 mb-2" style="z-index: 2000;">
                         <div class="container-lg">
                             <button id="toggler-button-menu" class="navbar-toggler border-0 my-2 text-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample08" aria-controls="navbarsExample08" aria-expanded="false" aria-label="Toggle navigation">
@@ -74,43 +75,142 @@
                             </div>
                         </div>
                     </nav>
-                    <div id="register_div" class="h-100 d-flex justify-content-end">
+
+                    <div id="register_div" class="h-100 d-flex justify-content-start">
                         <div id="register_card" class="card mx-4 mx-md-5 shadow-5-strong" style="
                             background: hsla(0, 0%, 30%, 0.7);
                             backdrop-filter: blur(10px);
                             height: 90%;
                             width: calc(100%/3);
                         ">
-                            <form class="card-body my-4 px-4 py-5 px-md-5 d-flex flex-column">
+                            <form class="card-body px-4 py-5 px-md-5 d-flex flex-column">
                                 <div id="description" class="text-light h-25">
                                     <h1 class="fw-bolder">Register</h1>
                                     <h5>Enter your account</h5>
                                 </div>
                                 <div id="inputs" class="h-50 d-flex align-items-center justify-content-center flex-column">
+
+                                    <a type="button" class="btn btn-outline-white mb-4 " id="modalbtn" data-mdb-toggle="modal" data-mdb-target="#exampleModal">
+                                        Select a Profile Picture
+                                    </a>
+
+                                    <div class="btn-group w-100 mb-4">
+                                        <input type="radio" class="btn-check" name="options" id="option1" autocomplete="off" checked/>
+                                        <label class="btn btn-outline-light py-2" for="option1">Subscriber</label>
+
+                                        <input type="radio" class="btn-check" name="options" id="option2" autocomplete="off" />
+                                        <label class="btn btn-outline-light py-2" for="option2">Publisher</label>
+                                    </div>
+
+                                    <div class="d-flex flex-row justify-content-between mb-4 w-100">
+                                        <div class="form-outline w-50 pe-2">
+                                            <input type="text" id="firstname_id" class="form-control bg-white bg-opacity-10 py-2 text-light">
+                                            <label class="form-label text-light pe-2" for="firstname_id" style="margin-left: 0;">First Name</label>
+                                        </div>
+                                        <div class="form-outline w-50 ps-2">
+                                            <input type="text" id="lastname_id" class="form-control bg-white bg-opacity-10 py-2 text-light">
+                                            <label class="form-label text-light ps-2" for="lastname_id" style="margin-left: 0;">Last Name</label>
+                                        </div>
+                                    </div>
                                     <div class="form-outline mb-4 col-12">
-                                        <input type="email" id="user_id" class="form-control bg-white bg-opacity-10 py-2 text-light">
-                                        <label class="form-label text-light" for="user_id" style="margin-left: 0;">Username or Email</label>
+                                        <input type="text" id="email_id" class="form-control bg-white bg-opacity-10 py-2 text-light">
+                                        <label class="form-label text-light" for="email_id" style="margin-left: 0;">Email</label>
                                     </div>
                                     <div class="form-outline mb-4 col-12">
                                         <input type="password" id="pass_id" class="form-control bg-white bg-opacity-10 py-2 text-light">
                                         <label class="form-label text-light" for="pass_id" style="margin-left: 0;">Password</label>
                                     </div>
+                                    <div class="form-outline mb-4 col-12">
+                                        <input type="password" id="confirmpass_id" class="form-control bg-white bg-opacity-10 py-2 text-light">
+                                        <label class="form-label text-light" for="confirmpass_id" style="margin-left: 0;">Confirm Password</label>
+                                    </div>
                                 </div>
+
                                 <div id="buttons" class="h-25 d-flex align-items-end bottom-0">
                                     <div class="d-flex flex-column col-12">
-                                        <button type="submit" class="btn btn-primary btn-block mb-3">Sign in</button>
+                                        <button type="submit" class="btn btn-primary btn-block mb-3">Sign Up</button>
                                         <div class="col-12 text-center text-muted">
-                                            <p>Don't have an Account? <a href="#!">Sign Up</a></p>
+                                            <p>Already have an Account? <a href="#!">Sign In</a></p>
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Script for the photo load -->
+                                <script>
+                                    $(document).ready(function() {
+                                        // Prepare the preview for profile picture
+                                        $("#wizard-picture").change(function(){
+                                            readURL(this);
+                                        });
+                                    });
+                                    function readURL(input) {
+                                        if (input.files && input.files[0]) {
+                                            let reader = new FileReader();
+
+                                            reader.onload = function (e) {
+                                                $('#wizardPicturePreview').attr('src', e.target.result).fadeIn('slow');
+                                            }
+                                            reader.readAsDataURL(input.files[0]);
+                                        }
+                                    }
+                                </script>
                             </form>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
     </main>
+    <section id="modals h-100">
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+            <div class="modal-dialog h-100 d-flex align-items-center">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="exampleModalLabel">Load Profile Picture</h5>
+                        <button type="button" class="btn-close" data-mdb-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body px-2">
+                        <div class="d-flex flex-row gap-4 mb-4 justify-content-center h-100" id="imgPreview">
+                            <img src="https://image.shutterstock.com/image-photo/young-brazilian-man-isolated-on-600w-2113734536.jpg" alt="" width="100px" class="img-fluid visually-hidden" style="
+                                object-fit: cover !important;
+                                aspect-ratio: 1/1;
+                            ">
+                            <img src="https://image.shutterstock.com/image-photo/young-brazilian-man-isolated-on-600w-2113734536.jpg" alt="" width="100px" class="img-fluid rounded-circle visually-hidden" style="
+                                object-fit: cover !important;
+                                aspect-ratio: 1/1;
+                            ">
+                        </div>
+                        <div class="d-flex flex-row justify-content-center mt-4 w-100">
+                            <input id="imgInput" type="file" accept="image/png,image/jpeg"></input>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-primary" data-mdb-dismiss="modal">Save changes</button>
+                    </div>
+                </div>
+            </div>
+            <script>
+                let imgInput = document.getElementById("imgInput");
+
+                imgInput.addEventListener("input", () => {
+                    document.querySelectorAll("#imgPreview > img").forEach((e) => {
+                        let selectedFile = imgInput.files[0];
+                        let reader = new FileReader();
+
+                        e.title = selectedFile.name;
+                        reader.onload = function(event) {
+                            e.src = event.target.result;
+                        }
+
+                        reader.readAsDataURL(selectedFile);
+
+                        e.classList.remove("visually-hidden");
+                    });
+                });
+            </script>
+        </div>
+    </section>
 
 </body>
 </html>
