@@ -2,12 +2,9 @@ package com.cp.correioprivado.dados;
 
 import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 
-import static javax.persistence.GenerationType.AUTO;
+import java.util.List;
 
 @Entity
 @Data
@@ -22,4 +19,8 @@ public class Topic {
     private String title;
     @NonNull
     private String description;
+    @OneToMany (mappedBy = "topic")
+    private List <TopicSubscribed> topicSubscribed;
+    @OneToMany(mappedBy = "topic")
+    private List <News> news;
 }

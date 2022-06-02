@@ -31,6 +31,7 @@ public class CorreioPrivadoApplication {
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
     private final TopicRepo topicRepo;
+    /*
     @Bean
     CommandLineRunner run(UserService userService){
         return args -> {
@@ -60,4 +61,5 @@ public class CorreioPrivadoApplication {
             userService.saveNews(new News("Feira Municipal","Feira municipal a decorrer em Odemira",new Date(2022,5,22), userRepo.findByUsername("barbosa").getId(), topicRepo.findByTitle("Romarias e Feiras").getId()));
         };
     }
+    */
 }
