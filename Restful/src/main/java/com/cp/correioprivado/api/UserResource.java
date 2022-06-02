@@ -61,6 +61,10 @@ public class UserResource {
         return ResponseEntity.created(uri).body(userService.saveRole(role));
     }
 
+    @PostMapping("/user/getRole")
+    public ResponseEntity<Role>getRoleByUsername(@RequestBody String username){
+        return ResponseEntity.ok().body(userService.getRoleByUser(username));
+    }
 //    @PostMapping("/role/addtouser")
 //    public ResponseEntity<?>saveRole(@RequestBody RoleToUserForm form){
 //        userService.addRoleToUser(form.getUsername(), form.getRoleName());
