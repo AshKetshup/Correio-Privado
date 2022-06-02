@@ -4,22 +4,31 @@ import com.cp.correioprivado.dados.*;
 import com.cp.correioprivado.repo.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Service @RequiredArgsConstructor @Transactional @Slf4j
-public class UserServiceImplementation implements UserService{
+public class UserServiceImplementation implements UserService, UserDetailsService {
     private final UserRepo userRepo;
     private final RoleRepo roleRepo;
     private final NewsRepo newsRepo;
     private final TopicRepo topicRepo;
+    private final PasswordEncoder passwordEncoder;
 
     private final TopicSubscribedRepo topicSubscribedRepo;
     @Override
     public User saveUser(User user) {
         log.info("Saving new user {} to the database!", user.getName());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepo.save(user);
     }
 
@@ -103,5 +112,20 @@ public class UserServiceImplementation implements UserService{
         Topic topic = topicRepo.findByTitle(title);
         TopicSubscribed topicSubscribed = topicSubscribedRepo.findByTopicIdAndUserId(topic.getId(), user.getId());
         topicSubscribedRepo.delete(topicSubscribed);
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepo.findByUsername(username);
+        if(user == null) {
+            log.error("User not Found");
+            throw new UsernameNotFoundException("User not found in the db");
+        } else {
+            log.info("User Found");
+        }
+        Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
+        authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
+
+        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
     }
 }
