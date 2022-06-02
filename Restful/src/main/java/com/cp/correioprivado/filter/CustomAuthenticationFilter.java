@@ -44,23 +44,25 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
-        log.info("Username is {}", username);
+        log.info("User is connecting with Username={}", username);
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, password);
         return authenticationManager.authenticate(authenticationToken);
     }
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
-        User user = (User) authentication.getPrincipal();
+        com.cp.correioprivado.dados.User user = (com.cp.correioprivado.dados.User) authentication.getPrincipal();
+
+        //User user = (User) authentication.getPrincipal();
         Algorithm algorithm = Algorithm.HMAC256(super_secret_seed_for_tokens.getBytes());
         String access_token = JWT.create()
-                .withSubject(user.getUsername())
+                .withSubject(user.getId().toString())
                 .withExpiresAt((new Date(System.currentTimeMillis() + access_token_expiration_time)))
                 .withIssuer(request.getRequestURL().toString())
-                .withClaim("role", String.valueOf(user.getAuthorities()))
+                .withClaim("role", String.valueOf(user.getRole()))
                 .sign(algorithm);
         String refresh_token = JWT.create()
-                .withSubject(user.getUsername())
+                .withSubject(user.getId().toString())
                 .withExpiresAt((new Date(System.currentTimeMillis() + refresh_token_expiration_time)))
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
