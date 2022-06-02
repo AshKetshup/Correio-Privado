@@ -15,6 +15,7 @@ public class UserServiceImplementation implements UserService{
     private final RoleRepo roleRepo;
     private final NewsRepo newsRepo;
     private final TopicRepo topicRepo;
+    private final NotificationsRepo notificationsRepo;
 
     private final TopicSubscribedRepo topicSubscribedRepo;
     @Override
@@ -32,6 +33,12 @@ public class UserServiceImplementation implements UserService{
     @Override
     public News saveNews(News news) {
         log.info("Saving new news {} to the database!", news.getTitle());
+
+        List<TopicSubscribed> listSubscriptions = topicSubscribedRepo.findByTopicId(news.getTopic().getId());
+        for(int i = 0; i < listSubscriptions.size(); i++){
+            saveNotification(new Notifications(
+                    "Notícia nova no tópico: " + news.getTopic().getTitle(), false, news, listSubscriptions.get(i).getUser()));
+        }
         return newsRepo.save(news);
     }
 
@@ -39,14 +46,6 @@ public class UserServiceImplementation implements UserService{
     public Topic saveTopic(Topic topic) {
         log.info("Saving new topic {} to the database!", topic.getTitle());
         return topicRepo.save(topic);
-    }
-
-    @Override
-    public void addRoleToUser(String username, String name) {
-        User user = userRepo.findByUsername(username);
-        Role role = roleRepo.findByName(name);
-        //user.setRoleId(role.getId());
-        log.info("Saving adding role {} to user {}!",role.getName(),user.getName());
     }
 
     @Override
@@ -93,6 +92,12 @@ public class UserServiceImplementation implements UserService{
     }
 
     @Override
+    public void removeTopic(String title) {
+        log.info("Deleting topic: {}!", topicRepo.findById(title));
+        topicRepo.deleteById(title);
+    }
+
+    @Override
     public List<News> getNews() {
         return newsRepo.findAll();
     }
@@ -102,6 +107,37 @@ public class UserServiceImplementation implements UserService{
         User user = userRepo.findByUsername(username);
         Topic topic = topicRepo.findByTitle(title);
         TopicSubscribed topicSubscribed = topicSubscribedRepo.findByTopicIdAndUserId(topic.getId(), user.getId());
-        topicSubscribedRepo.delete(topicSubscribed);
+        log.info("Deleting subscribed topic: {}!", topicSubscribed.getTopic().getTitle());
+        topicSubscribedRepo.deleteById(topicSubscribed.getId());
+    }
+
+    @Override
+    public List<TopicSubscribed> getTopicSubscribed() {
+        return topicSubscribedRepo.findAll();
+    }
+
+    @Override
+    public List<TopicSubscribed> getTopicsSubscribedByUser(Long id){
+        return topicSubscribedRepo.findByUserId(id);
+    }
+    @Override
+    public Notifications saveNotification(Notifications notification) {
+        log.info("Saving new notification {} to the database!", notification.getMessage());
+        return  notificationsRepo.save(notification);
+    }
+
+    @Override
+    public List<Notifications> getNotifications() {
+        return notificationsRepo.findAll();
+    }
+    @Override
+    public List<Notifications> getNotificationsByUser(Long id) {
+        return notificationsRepo.findByUserId(id);
+    }
+
+    @Override
+    public void removeNotification(long id) {
+        log.info("Deleting notification: {}!", notificationsRepo.findById(id));
+        notificationsRepo.deleteById(id);
     }
 }

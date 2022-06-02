@@ -2,8 +2,11 @@ package com.cp.correioprivado.api;
 
 import com.cp.correioprivado.dados.*;
 import com.cp.correioprivado.service.UserService;
+import com.sun.nio.sctp.Notification;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import org.aspectj.weaver.ast.Not;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
@@ -27,6 +30,16 @@ public class UserResource {
         return ResponseEntity.ok().body(userService.getRoles());
     }
 
+    @GetMapping("/topicssubscribed")
+    public ResponseEntity<List<TopicSubscribed>>getTopicsSubscribed(){
+        return ResponseEntity.ok().body(userService.getTopicSubscribed());
+    }
+
+    @GetMapping("/notifications")
+    public ResponseEntity<List<Notifications>>getNotifications(){
+        return ResponseEntity.ok().body(userService.getNotifications());
+    }
+
     @GetMapping("/topics")
     public ResponseEntity<List<Topic>>getTopics(){
         return ResponseEntity.ok().body(userService.getTopics());
@@ -48,11 +61,11 @@ public class UserResource {
         return ResponseEntity.created(uri).body(userService.saveRole(role));
     }
 
-    @PostMapping("/role/addtouser")
-    public ResponseEntity<?>saveRole(@RequestBody RoleToUserForm form){
-        userService.addRoleToUser(form.getUsername(), form.getRoleName());
-        return ResponseEntity.ok().build();
-    }
+//    @PostMapping("/role/addtouser")
+//    public ResponseEntity<?>saveRole(@RequestBody RoleToUserForm form){
+//        userService.addRoleToUser(form.getUsername(), form.getRoleName());
+//        return ResponseEntity.ok().build();
+//    }
 
     @PostMapping("/news/save")
     public ResponseEntity<News>saveNews(@RequestBody News news){
@@ -66,10 +79,44 @@ public class UserResource {
         return ResponseEntity.created(uri).body(userService.saveTopic(topic));
     }
 
+    @DeleteMapping("/topic/remove")
+    public ResponseEntity<String>removeTopic(@RequestBody String title){
+        userService.removeTopic(title);
+        return ResponseEntity.ok(title);
+    }
+
     @PostMapping("/topic_subscribed/subscribe")
     public ResponseEntity<TopicSubscribed>subscribeTopic(@RequestBody TopicSubscribeForm form){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/topic_subscribed/subscribe").toUriString());
         return ResponseEntity.created(uri).body(userService.subscribeTopic(form.getUsername(),form.getTitle()));
+    }
+
+    @DeleteMapping("/topic_subscribed/unsubscribe")
+    public ResponseEntity<TopicSubscribeForm>removeTopicSubscribed(@RequestBody TopicSubscribeForm form){
+        userService.removeTopicSubscribed(form.getUsername(),form.getTitle());
+        return ResponseEntity.ok(form);
+    }
+
+    @GetMapping("/topic_subscribedByUser")
+    public ResponseEntity<List<TopicSubscribed>>getTopicsSubscribedByUser(@RequestBody Long id){
+        return ResponseEntity.ok().body(userService.getTopicsSubscribedByUser(id));
+    }
+
+    @PostMapping("/notifications/save")
+    public ResponseEntity<Notifications>saveNotifications(@RequestBody Notifications notification){
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/notifications/save").toUriString());
+        return ResponseEntity.created(uri).body(userService.saveNotification(notification));
+    }
+
+    @DeleteMapping("/notifications/remove")
+    public ResponseEntity<Long>removeNotification(@RequestBody Long id){
+        userService.removeNotification(id);
+        return ResponseEntity.ok(id);
+    }
+
+    @GetMapping("/notificationsByUser")
+    public ResponseEntity<List<Notifications>>getNotificationsByUser(@RequestBody Long id){
+        return ResponseEntity.ok().body(userService.getNotificationsByUser(id));
     }
 }
 

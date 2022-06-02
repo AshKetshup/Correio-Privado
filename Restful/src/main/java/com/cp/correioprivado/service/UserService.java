@@ -10,7 +10,6 @@ public interface UserService {
     User saveUser(User user);
     List<User> getUsers();
     User getUser(String username);
-    void addRoleToUser(String username, String name);
 
     // ROLE
     Role saveRole(Role role);
@@ -25,11 +24,18 @@ public interface UserService {
     // TOPIC
     Topic saveTopic(Topic topic);
     List<Topic> getTopics();
+    void removeTopic(String title);
 
     // TOPIC_SUBSCRIBED
     TopicSubscribed subscribeTopic(String username, String topic);
     void removeTopicSubscribed(String username, String title);
+    List<TopicSubscribed> getTopicSubscribed();
+    List<TopicSubscribed> getTopicsSubscribedByUser(Long id);
 
     // NOTIFICATION
+    Notifications saveNotification(Notifications notification);
+    List<Notifications> getNotifications();
+    List<Notifications> getNotificationsByUser(Long id);
+    void removeNotification(long id);
 }
 

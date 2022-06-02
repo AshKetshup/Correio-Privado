@@ -7,8 +7,6 @@ import javax.persistence.*;
 import java.sql.Date;
 import java.util.List;
 
-import static javax.persistence.GenerationType.AUTO;
-
 @Entity
 @Data
 @NoArgsConstructor
@@ -23,9 +21,11 @@ public class News {
     @NonNull
     private String content;
     @NonNull
-    private Date release_date;
+    private Date releaseDate;
+    @NonNull
     @ManyToOne
     private User user;
+    @NonNull
     @ManyToOne
     private Topic topic;
     @OneToMany (mappedBy = "news")
