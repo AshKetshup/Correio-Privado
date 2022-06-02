@@ -73,6 +73,12 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     }
 
     @Override
+    public User getUserById(Long id) {
+        log.info("Getting user {}!", id);
+        return userRepo.findById(id);
+    }
+
+    @Override
     public News getNewsByTitle(String title) {
         log.info("Getting news {}!", title);
         return newsRepo.findByTitle(title);
