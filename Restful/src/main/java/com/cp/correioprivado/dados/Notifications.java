@@ -1,9 +1,7 @@
 package com.cp.correioprivado.dados;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -11,14 +9,19 @@ import javax.persistence.*;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
+@RequiredArgsConstructor
 public class Notifications {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @NonNull
     private String message;
-    private String isRead;
+    @NonNull
+    private boolean isRead;
+    @NonNull
     @ManyToOne
     private News news;
+    @NonNull
     @ManyToOne
     private User user;
 }

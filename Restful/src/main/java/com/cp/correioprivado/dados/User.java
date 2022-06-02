@@ -20,6 +20,7 @@ public class User {
     private String email;
     @NonNull
     private String password; // password can be salted with BCryptPasswordEncoder
+    @NonNull
     @ManyToOne
     private Role role;
     @OneToMany(mappedBy = "user")
