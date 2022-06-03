@@ -15,9 +15,11 @@ public class TopicSubscribed {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
     @NonNull
-    @ManyToOne
+    @ManyToOne()
+    @JoinColumn(name = "userId", referencedColumnName = "id", insertable = false, updatable = false)
     private User user;
     @NonNull
     @ManyToOne
+    @JoinColumn(name = "topicId", referencedColumnName = "id", insertable = false, updatable = false)
     private Topic topic;
 }

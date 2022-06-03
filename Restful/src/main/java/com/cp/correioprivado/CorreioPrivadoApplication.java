@@ -38,7 +38,7 @@ public class CorreioPrivadoApplication {
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-    /*
+
     @Bean
     CommandLineRunner run(UserService userService){
         return args -> {
@@ -63,9 +63,7 @@ public class CorreioPrivadoApplication {
             userService.saveNews(new News("Tempestade","Tempestade forte na região norte",new Date(2022,5,22),userRepo.findByUsername("barbosa"),topicRepo.findByTitle("Metereologia")));
             userService.saveNews(new News("Feira Municipal","Feira municipal a decorrer em Odemira",new Date(2022,5,22),userRepo.findByUsername("lopesdasilva"),topicRepo.findByTitle("Romarias e Feiras")));
 
-            userService.removeTopicSubscribed(userRepo.findByUsername("fernando").getUsername(),topicRepo.findByTitle("Festivais").getTitle());
-
-
+            //userService.removeTopicSubscribed(userRepo.findByUsername("fernando").getUsername(),topicRepo.findByTitle("Festivais").getTitle());
         };
-    }*/
+    }
 }

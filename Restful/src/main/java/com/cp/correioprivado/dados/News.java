@@ -23,11 +23,13 @@ public class News {
     @NonNull
     private Date releaseDate;
     @NonNull
-    @ManyToOne
+    @ManyToOne()
+    @JoinColumn(name = "userId", referencedColumnName = "id", insertable = false, updatable = false)
     private User user;
     @NonNull
-    @ManyToOne
+    @ManyToOne()
+    @JoinColumn(name = "topicID", referencedColumnName = "id", insertable = false, updatable = false)
     private Topic topic;
-    @OneToMany (mappedBy = "news")
+    @OneToMany (targetEntity = Notifications.class, mappedBy = "news", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<Notifications> notifications;
 }

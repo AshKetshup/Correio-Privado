@@ -21,12 +21,13 @@ public class User {
     @NonNull
     private String password; // password can be salted with BCryptPasswordEncoder
     @NonNull
-    @ManyToOne
+    @ManyToOne()
+    @JoinColumn(name = "roleId", referencedColumnName = "id", insertable = false, updatable = false)
     private Role role;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(targetEntity = TopicSubscribed.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<TopicSubscribed> topics;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(targetEntity = News.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List <News> news;
-    @OneToMany (mappedBy ="user")
+    @OneToMany(targetEntity = Notifications.class, mappedBy = "user", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List <Notifications> notifications;
 }

@@ -19,8 +19,8 @@ public class Topic {
     private String title;
     @NonNull
     private String description;
-    @OneToMany (mappedBy = "topic")
+    @OneToMany (targetEntity = TopicSubscribed.class, mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List <TopicSubscribed> topicSubscribed;
-    @OneToMany(mappedBy = "topic")
+    @OneToMany (targetEntity = News.class, mappedBy = "topic", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List <News> news;
 }

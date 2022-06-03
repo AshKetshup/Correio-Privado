@@ -19,9 +19,11 @@ public class Notifications {
     @NonNull
     private boolean isRead;
     @NonNull
-    @ManyToOne
+    @ManyToOne()
+    @JoinColumn(name = "newsId", referencedColumnName = "id", insertable = false, updatable = false)
     private News news;
     @NonNull
-    @ManyToOne
+    @ManyToOne()
+    @JoinColumn(name = "userId", referencedColumnName = "id", insertable = false, updatable = false)
     private User user;
 }
