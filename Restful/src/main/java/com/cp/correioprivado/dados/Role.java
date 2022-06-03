@@ -9,6 +9,7 @@ import java.util.List;
 import static javax.persistence.GenerationType.AUTO;
 
 @Entity @Data @NoArgsConstructor @AllArgsConstructor @RequiredArgsConstructor
+@Table(name="role")
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -17,6 +18,4 @@ public class Role {
     private String name;
     @NonNull
     private String description;
-    @OneToMany(mappedBy = "role")
-    private List<User> user;
 }

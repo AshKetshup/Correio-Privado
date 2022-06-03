@@ -7,7 +7,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Entity @Data @NoArgsConstructor @AllArgsConstructor @RequiredArgsConstructor
-@Table(uniqueConstraints = {@UniqueConstraint(columnNames = {"id","username", "email"})})
+@Table(name="user", uniqueConstraints = {@UniqueConstraint(columnNames = {"id","username", "email"})})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -21,12 +21,7 @@ public class User {
     @NonNull
     private String password; // password can be salted with BCryptPasswordEncoder
     @NonNull
-    @ManyToOne
+    @ManyToOne()
+    @JoinColumn(name = "roleId")
     private Role role;
-    @OneToMany(mappedBy = "user")
-    private List<TopicSubscribed> topics;
-    @OneToMany(mappedBy = "user")
-    private List <News> news;
-    @OneToMany (mappedBy ="user")
-    private List <Notifications> notifications;
 }

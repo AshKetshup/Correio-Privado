@@ -11,6 +11,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
+@Table(name="topic")
 public class Topic {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,8 +20,4 @@ public class Topic {
     private String title;
     @NonNull
     private String description;
-    @OneToMany (mappedBy = "topic")
-    private List <TopicSubscribed> topicSubscribed;
-    @OneToMany(mappedBy = "topic")
-    private List <News> news;
 }

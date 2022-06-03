@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
+@Table(name="news")
 public class News {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,11 +24,11 @@ public class News {
     @NonNull
     private Date releaseDate;
     @NonNull
-    @ManyToOne
+    @ManyToOne()
+    @JoinColumn(name = "userId")
     private User user;
     @NonNull
-    @ManyToOne
+    @ManyToOne()
+    @JoinColumn(name = "topicID")
     private Topic topic;
-    @OneToMany (mappedBy = "news")
-    private List<Notifications> notifications;
 }
