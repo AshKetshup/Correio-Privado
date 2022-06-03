@@ -25,6 +25,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
+
+
     static final int access_token_expiration_time = 1000 * 60 * 60 * 24; //currently set to 24h
     //--------------------------------------milsec--sec--min--hour----------------------
     static final int refresh_token_expiration_time = 1000 * 60 * 60 * 24; //currently set to 24h
