@@ -61,6 +61,11 @@ public class UserResource {
         return ResponseEntity.created(uri).body(userService.saveRole(role));
     }
 
+    @PostMapping("/newsByTopic")
+    public ResponseEntity<News>getNewByTopic(@RequestBody String topic){
+        return ResponseEntity.ok().body(userService.getNewsByTopic(topic));
+    }
+
     @PostMapping("/user/getRole")
     public ResponseEntity<Role>getRoleByUsername(@RequestBody String username){
         return ResponseEntity.ok().body(userService.getRoleByUser(username));
