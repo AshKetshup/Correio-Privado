@@ -10,6 +10,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
+@Table(name="notifications")
 public class Notifications {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -19,9 +20,11 @@ public class Notifications {
     @NonNull
     private boolean isRead;
     @NonNull
-    @ManyToOne
+    @ManyToOne()
+    @JoinColumn(name = "newsId")
     private News news;
     @NonNull
-    @ManyToOne
+    @ManyToOne()
+    @JoinColumn(name = "userId")
     private User user;
 }
