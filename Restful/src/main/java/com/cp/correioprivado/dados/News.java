@@ -12,6 +12,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @RequiredArgsConstructor
+@Table(name="news")
 public class News {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -24,12 +25,10 @@ public class News {
     private Date releaseDate;
     @NonNull
     @ManyToOne()
-    @JoinColumn(name = "userId", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "userId")
     private User user;
     @NonNull
     @ManyToOne()
-    @JoinColumn(name = "topicID", referencedColumnName = "id", insertable = false, updatable = false)
+    @JoinColumn(name = "topicID")
     private Topic topic;
-    @OneToMany (targetEntity = Notifications.class, mappedBy = "news", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Notifications> notifications;
 }
