@@ -8,5 +8,5 @@ import java.util.Optional;
 
 public interface NotificationsRepo extends JpaRepository<Notifications,Long> {
     Optional<Notifications> findById(Long id);
-    List<Notifications> findByUserId(Long id);
+    List<Notifications> findAllByUserId(Long id);
 }

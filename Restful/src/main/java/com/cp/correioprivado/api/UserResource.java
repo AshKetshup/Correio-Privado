@@ -1,6 +1,8 @@
 package com.cp.correioprivado.api;
 
 import com.cp.correioprivado.dados.*;
+import com.cp.correioprivado.repo.NewsRepo;
+import com.cp.correioprivado.repo.UserRepo;
 import com.cp.correioprivado.service.UserService;
 import com.sun.nio.sctp.Notification;
 import lombok.Data;
@@ -8,17 +10,24 @@ import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Not;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class UserResource {
     private final UserService userService;
+    private final UserRepo userRepo;
+    private final NewsRepo newsRepo;
 
     @GetMapping("/users")
     public ResponseEntity<List<User>>getUsers(){
@@ -49,11 +58,40 @@ public class UserResource {
         return ResponseEntity.ok().body(userService.getNews());
     }
 
+//    @PostMapping("/user/save")
+//    public ResponseEntity<User>saveUser(@RequestBody User user){
+//        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
+//        return ResponseEntity.created(uri).body(userService.saveUser(user));
+//    }
+
     @PostMapping("/user/save")
-    public ResponseEntity<User>saveUser(@RequestBody User user){
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveUser(user));
+    public RedirectView saveUser(User user,
+    @RequestParam("image") MultipartFile multipartFile) throws IOException {
+        if(multipartFile != null)
+            userService.saveUser(user, multipartFile);
+        else
+            userService.saveUser(user);
+        return new RedirectView("/users", true);
     }
+
+    @GetMapping("/user/getImage")
+    public ResponseEntity<String>getUserImage(@RequestBody String id){
+        Optional<User> user = userRepo.findById(id);
+        if (user.isEmpty())
+            return ResponseEntity.ok().body("");
+        else
+            return ResponseEntity.ok().body(user.get().getPhotoImagePath());
+    }
+
+    @GetMapping("/news/getImage")
+    public ResponseEntity<String>getNewsImage(@RequestBody String id){
+        Optional<News> news = newsRepo.findById(id);
+        if (news.isEmpty())
+            return ResponseEntity.ok().body("");
+        else
+            return ResponseEntity.ok().body(news.get().getPhotoImagePath());
+    }
+
 
     @PostMapping("/role/save")
     public ResponseEntity<Role>saveRole(@RequestBody Role role){
@@ -62,8 +100,13 @@ public class UserResource {
     }
 
     @PostMapping("/newsByTopic")
-    public ResponseEntity<News>getNewByTopic(@RequestBody String topic){
+    public ResponseEntity<List<News>>getNewByTopic(@RequestBody String topic){
         return ResponseEntity.ok().body(userService.getNewsByTopic(topic));
+    }
+
+    @PostMapping("/newsByUser")
+    public ResponseEntity<List<News>>getNewByTopic(@RequestBody Long id){
+        return ResponseEntity.ok().body(userService.getNewsByUser(id));
     }
 
     @PostMapping("/user/getRole")
@@ -77,9 +120,13 @@ public class UserResource {
 //    }
 
     @PostMapping("/news/save")
-    public ResponseEntity<News>saveNews(@RequestBody News news){
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/news/save").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveNews(news));
+    public RedirectView saveNews(News news,
+        @RequestParam("image") MultipartFile multipartFile) throws IOException {
+            if(multipartFile != null)
+                userService.saveNews(news, multipartFile);
+            else
+                userService.saveNews(news);
+            return new RedirectView("/news", true);
     }
 
     @PostMapping("/topic/save")
