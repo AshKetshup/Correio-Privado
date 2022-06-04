@@ -1,13 +1,16 @@
 package com.cp.correioprivado.service;
 
 import com.cp.correioprivado.dados.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
 
 public interface UserService {
 
     // USER
     User saveUser(User user);
+    User saveUser(User user, MultipartFile multipartFile) throws IOException;
     List<User> getUsers();
     User getUser(String username);
     User getUserById(Long id);
@@ -39,5 +42,7 @@ public interface UserService {
     List<Notifications> getNotifications();
     List<Notifications> getNotificationsByUser(Long id);
     void removeNotification(long id);
+
+    // FILE MANAGEMENT
 }
 

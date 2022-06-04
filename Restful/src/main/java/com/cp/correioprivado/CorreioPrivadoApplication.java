@@ -55,15 +55,15 @@ public class CorreioPrivadoApplication {
             userService.saveTopic(new Topic("Metereologia","Notícias do Tempo"));
             userService.saveTopic(new Topic("Romarias e Feiras","Romarias e feiras por todo o país"));
 
-            userService.subscribeTopic(userRepo.findByUsername("meireles").getUsername(),topicRepo.findByTitle("Desporto").getTitle());
-            userService.subscribeTopic(userRepo.findByUsername("fernando").getUsername(),topicRepo.findByTitle("Festivais").getTitle());
+            userService.subscribeTopic(userRepo.findByUsername("meireles").getSurname(),topicRepo.findByTitle("Desporto").getTitle());
+            userService.subscribeTopic(userRepo.findByUsername("fernando").getSurname(),topicRepo.findByTitle("Festivais").getTitle());
 
             userService.saveNews(new News("Benfica-Sporting","O jogo de benfica-sporting começará em breve",new Date(2022,5,22),userRepo.findByUsername("barbosa"),topicRepo.findByTitle("Desporto")));
             userService.saveNews(new News("Festival de Coimbra","Coimbra terá um novo festival",new Date(2022,5,22),userRepo.findByUsername("lopesdasilva"),topicRepo.findByTitle("Festivais")));
             userService.saveNews(new News("Tempestade","Tempestade forte na região norte",new Date(2022,5,22),userRepo.findByUsername("barbosa"),topicRepo.findByTitle("Metereologia")));
             userService.saveNews(new News("Feira Municipal","Feira municipal a decorrer em Odemira",new Date(2022,5,22),userRepo.findByUsername("lopesdasilva"),topicRepo.findByTitle("Romarias e Feiras")));
 
-            userService.removeTopicSubscribed(userRepo.findByUsername("fernando").getUsername(),topicRepo.findByTitle("Festivais").getTitle());
+            userService.removeTopicSubscribed(userRepo.findByUsername("fernando").getSurname(),topicRepo.findByTitle("Festivais").getTitle());
         };
     }
 }

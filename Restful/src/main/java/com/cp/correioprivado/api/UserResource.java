@@ -1,6 +1,7 @@
 package com.cp.correioprivado.api;
 
 import com.cp.correioprivado.dados.*;
+import com.cp.correioprivado.repo.UserRepo;
 import com.cp.correioprivado.service.UserService;
 import com.sun.nio.sctp.Notification;
 import lombok.Data;
@@ -8,17 +9,23 @@ import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Not;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class UserResource {
     private final UserService userService;
+    private final UserRepo userRepo;
 
     @GetMapping("/users")
     public ResponseEntity<List<User>>getUsers(){
@@ -49,10 +56,29 @@ public class UserResource {
         return ResponseEntity.ok().body(userService.getNews());
     }
 
+//    @PostMapping("/user/save")
+//    public ResponseEntity<User>saveUser(@RequestBody User user){
+//        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
+//        return ResponseEntity.created(uri).body(userService.saveUser(user));
+//    }
+
     @PostMapping("/user/save")
-    public ResponseEntity<User>saveUser(@RequestBody User user){
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveUser(user));
+    public RedirectView saveUser(User user,
+    @RequestParam("image") MultipartFile multipartFile) throws IOException {
+        if(multipartFile != null)
+            userService.saveUser(user, multipartFile);
+        else
+            userService.saveUser(user);
+        return new RedirectView("/users", true);
+    }
+
+    @GetMapping("/user/getImage")
+    public ResponseEntity<String>getImage(@RequestBody String id){
+        Optional<User> user = userRepo.findById(id);
+        if (user.isEmpty())
+            return ResponseEntity.ok().body("");
+        else
+            return ResponseEntity.ok().body(user.get().getPhotoImagePath());
     }
 
     @PostMapping("/role/save")

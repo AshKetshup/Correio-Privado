@@ -11,10 +11,14 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 @Service @RequiredArgsConstructor @Transactional @Slf4j
 public class UserServiceImplementation implements UserService, UserDetailsService {
@@ -27,12 +31,26 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
     private final TopicSubscribedRepo topicSubscribedRepo;
     @Override
-    public User saveUser(User user) {
+    public User saveUser(User user, MultipartFile multipartFile) throws IOException {
+
+        String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
+        user.setPhoto(fileName);
+        User savedUser = userRepo.save(user);
+        log.info("Saving new photo {} to the database!", fileName);
+        String uploadDir = "user-photos/" + savedUser.getId();
+        FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
+
         log.info("Saving new user {} to the database!", user.getName());
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         return userRepo.save(user);
     }
 
+    @Override
+    public User saveUser(User user) {
+        log.info("Saving new user {} to the database!", user.getName());
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        return userRepo.save(user);
+    }
     @Override
     public Role saveRole(Role role) {
         log.info("Saving new role {} to the database!", role.getName());
@@ -173,6 +191,6 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
 
-        return new org.springframework.security.core.userdetails.User(user.getUsername(), user.getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(user.getSurname(), user.getPassword(), authorities);
     }
 }
