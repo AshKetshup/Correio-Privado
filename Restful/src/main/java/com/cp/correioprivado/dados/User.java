@@ -4,10 +4,8 @@ import lombok.*;
 
 import javax.persistence.*;
 
-import java.util.List;
-
 @Entity @Data @NoArgsConstructor @AllArgsConstructor @RequiredArgsConstructor
-@Table(name="user", uniqueConstraints = {@UniqueConstraint(columnNames = {"id","username", "email"})})
+@Table(name="user", uniqueConstraints = {@UniqueConstraint(columnNames = {"id","surname", "email"})})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -15,7 +13,7 @@ public class User {
     @NonNull
     private String name;
     @NonNull
-    private String username;
+    private String surname;
     @NonNull
     private String email;
     @NonNull
@@ -24,4 +22,12 @@ public class User {
     @ManyToOne()
     @JoinColumn(name = "roleId")
     private Role role;
+    @Column(nullable = true, length = 64)
+    private String photo;
+
+    public String getPhotoImagePath() {
+        if (photo == null || id == null) return null;
+
+        return "/user-photos/" + id + "/" + photo;
+    }
 }

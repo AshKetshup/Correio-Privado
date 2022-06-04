@@ -1,6 +1,8 @@
 package com.cp.correioprivado.api;
 
 import com.cp.correioprivado.dados.*;
+import com.cp.correioprivado.repo.NewsRepo;
+import com.cp.correioprivado.repo.UserRepo;
 import com.cp.correioprivado.service.UserService;
 import com.sun.nio.sctp.Notification;
 import lombok.Data;
@@ -8,17 +10,24 @@ import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Not;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.servlet.view.RedirectView;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
 @RequiredArgsConstructor
 public class UserResource {
     private final UserService userService;
+    private final UserRepo userRepo;
+    private final NewsRepo newsRepo;
 
     @GetMapping("/users")
     public ResponseEntity<List<User>>getUsers(){
@@ -49,11 +58,40 @@ public class UserResource {
         return ResponseEntity.ok().body(userService.getNews());
     }
 
+//    @PostMapping("/user/save")
+//    public ResponseEntity<User>saveUser(@RequestBody User user){
+//        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
+//        return ResponseEntity.created(uri).body(userService.saveUser(user));
+//    }
+
     @PostMapping("/user/save")
-    public ResponseEntity<User>saveUser(@RequestBody User user){
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveUser(user));
+    public RedirectView saveUser(User user,
+    @RequestParam("image") MultipartFile multipartFile) throws IOException {
+        if(multipartFile != null)
+            userService.saveUser(user, multipartFile);
+        else
+            userService.saveUser(user);
+        return new RedirectView("/users", true);
     }
+
+    @GetMapping("/user/getImage")
+    public ResponseEntity<String>getUserImage(@RequestBody String id){
+        Optional<User> user = userRepo.findById(id);
+        if (user.isEmpty())
+            return ResponseEntity.ok().body("");
+        else
+            return ResponseEntity.ok().body(user.get().getPhotoImagePath());
+    }
+
+    @GetMapping("/news/getImage")
+    public ResponseEntity<String>getNewsImage(@RequestBody String id){
+        Optional<News> news = newsRepo.findById(id);
+        if (news.isEmpty())
+            return ResponseEntity.ok().body("");
+        else
+            return ResponseEntity.ok().body(news.get().getPhotoImagePath());
+    }
+
 
     @PostMapping("/role/save")
     public ResponseEntity<Role>saveRole(@RequestBody Role role){
@@ -61,15 +99,26 @@ public class UserResource {
         return ResponseEntity.created(uri).body(userService.saveRole(role));
     }
 
-    @PostMapping("/newsByTopic")
-    public ResponseEntity<News>getNewByTopic(@RequestBody String topic){
+    @GetMapping("/newsByTopic")
+    public ResponseEntity<List<News>>getNewByTopic(@RequestBody String topic){
         return ResponseEntity.ok().body(userService.getNewsByTopic(topic));
     }
 
-    @PostMapping("/user/getRole")
-    public ResponseEntity<Role>getRoleByUsername(@RequestBody String username){
-        return ResponseEntity.ok().body(userService.getRoleByUser(username));
+    @GetMapping("/newsByUser")
+    public ResponseEntity<List<News>>getNewByTopic(@RequestBody Long id){
+        return ResponseEntity.ok().body(userService.getNewsByUser(id));
     }
+
+    @GetMapping("/userByEmail")
+    public ResponseEntity<User>getUserByEmail(@RequestBody String email){
+        return ResponseEntity.ok().body(userService.getUserByEmail(email));
+    }
+
+    @GetMapping("/user/getRole")
+    public ResponseEntity<Role>getRoleByEmail(@RequestBody String email){
+        return ResponseEntity.ok().body(userService.getRoleByUser(email));
+    }
+
 //    @PostMapping("/role/addtouser")
 //    public ResponseEntity<?>saveRole(@RequestBody RoleToUserForm form){
 //        userService.addRoleToUser(form.getUsername(), form.getRoleName());
@@ -77,9 +126,13 @@ public class UserResource {
 //    }
 
     @PostMapping("/news/save")
-    public ResponseEntity<News>saveNews(@RequestBody News news){
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/news/save").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveNews(news));
+    public RedirectView saveNews(News news,
+        @RequestParam("image") MultipartFile multipartFile) throws IOException {
+            if(multipartFile != null)
+                userService.saveNews(news, multipartFile);
+            else
+                userService.saveNews(news);
+            return new RedirectView("/news", true);
     }
 
     @PostMapping("/topic/save")
@@ -97,12 +150,12 @@ public class UserResource {
     @PostMapping("/topic_subscribed/subscribe")
     public ResponseEntity<TopicSubscribed>subscribeTopic(@RequestBody TopicSubscribeForm form){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/topic_subscribed/subscribe").toUriString());
-        return ResponseEntity.created(uri).body(userService.subscribeTopic(form.getUsername(),form.getTitle()));
+        return ResponseEntity.created(uri).body(userService.subscribeTopic(form.getEmail(),form.getTitle()));
     }
 
     @DeleteMapping("/topic_subscribed/unsubscribe")
     public ResponseEntity<TopicSubscribeForm>removeTopicSubscribed(@RequestBody TopicSubscribeForm form){
-        userService.removeTopicSubscribed(form.getUsername(),form.getTitle());
+        userService.removeTopicSubscribed(form.getEmail(),form.getTitle());
         return ResponseEntity.ok(form);
     }
 
@@ -131,13 +184,13 @@ public class UserResource {
 
 @Data
 class RoleToUserForm {
-    private String username;
+    private String email;
     private String roleName;
 }
 
 @Data
 class TopicSubscribeForm{
-    private String username;
+    private String email;
     private String title;
 }
 
