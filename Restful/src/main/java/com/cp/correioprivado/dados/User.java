@@ -5,7 +5,7 @@ import lombok.*;
 import javax.persistence.*;
 
 @Entity @Data @NoArgsConstructor @AllArgsConstructor @RequiredArgsConstructor
-@Table(name="user", uniqueConstraints = {@UniqueConstraint(columnNames = {"id","username", "email"})})
+@Table(name="user", uniqueConstraints = {@UniqueConstraint(columnNames = {"id","surname", "email"})})
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)

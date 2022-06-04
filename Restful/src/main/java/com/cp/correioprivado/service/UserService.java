@@ -22,9 +22,11 @@ public interface UserService {
 
     // NEWS
     News saveNews(News news);
+    News saveNews(News news, MultipartFile multipartFile) throws IOException;
     List<News> getNews();
     News getNewsByTitle(String title);
-    News getNewsByTopic(String topic);
+    List<News> getNewsByTopic(String topic);
+    List<News> getNewsByUser(Long id);
 
     // TOPIC
     Topic saveTopic(Topic topic);

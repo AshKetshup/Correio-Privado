@@ -33,4 +33,10 @@ public class News {
     private Topic topic;
     @Column(nullable = true, length = 64)
     private String photo;
+
+    public String getPhotoImagePath() {
+        if (photo == null || id == null) return null;
+
+        return "/news-photos/" + id + "/" + photo;
+    }
 }

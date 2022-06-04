@@ -1,6 +1,7 @@
 package com.cp.correioprivado.api;
 
 import com.cp.correioprivado.dados.*;
+import com.cp.correioprivado.repo.NewsRepo;
 import com.cp.correioprivado.repo.UserRepo;
 import com.cp.correioprivado.service.UserService;
 import com.sun.nio.sctp.Notification;
@@ -26,6 +27,7 @@ import java.util.Optional;
 public class UserResource {
     private final UserService userService;
     private final UserRepo userRepo;
+    private final NewsRepo newsRepo;
 
     @GetMapping("/users")
     public ResponseEntity<List<User>>getUsers(){
@@ -73,13 +75,23 @@ public class UserResource {
     }
 
     @GetMapping("/user/getImage")
-    public ResponseEntity<String>getImage(@RequestBody String id){
+    public ResponseEntity<String>getUserImage(@RequestBody String id){
         Optional<User> user = userRepo.findById(id);
         if (user.isEmpty())
             return ResponseEntity.ok().body("");
         else
             return ResponseEntity.ok().body(user.get().getPhotoImagePath());
     }
+
+    @GetMapping("/news/getImage")
+    public ResponseEntity<String>getNewsImage(@RequestBody String id){
+        Optional<News> news = newsRepo.findById(id);
+        if (news.isEmpty())
+            return ResponseEntity.ok().body("");
+        else
+            return ResponseEntity.ok().body(news.get().getPhotoImagePath());
+    }
+
 
     @PostMapping("/role/save")
     public ResponseEntity<Role>saveRole(@RequestBody Role role){
@@ -88,8 +100,13 @@ public class UserResource {
     }
 
     @PostMapping("/newsByTopic")
-    public ResponseEntity<News>getNewByTopic(@RequestBody String topic){
+    public ResponseEntity<List<News>>getNewByTopic(@RequestBody String topic){
         return ResponseEntity.ok().body(userService.getNewsByTopic(topic));
+    }
+
+    @PostMapping("/newsByUser")
+    public ResponseEntity<List<News>>getNewByTopic(@RequestBody Long id){
+        return ResponseEntity.ok().body(userService.getNewsByUser(id));
     }
 
     @PostMapping("/user/getRole")
@@ -103,9 +120,13 @@ public class UserResource {
 //    }
 
     @PostMapping("/news/save")
-    public ResponseEntity<News>saveNews(@RequestBody News news){
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/news/save").toUriString());
-        return ResponseEntity.created(uri).body(userService.saveNews(news));
+    public RedirectView saveNews(News news,
+        @RequestParam("image") MultipartFile multipartFile) throws IOException {
+            if(multipartFile != null)
+                userService.saveNews(news, multipartFile);
+            else
+                userService.saveNews(news);
+            return new RedirectView("/news", true);
     }
 
     @PostMapping("/topic/save")
