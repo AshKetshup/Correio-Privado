@@ -214,6 +214,6 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();
         authorities.add(new SimpleGrantedAuthority(user.getRole().toString()));
 
-        return new org.springframework.security.core.userdetails.User(user.getSurname(), user.getPassword(), authorities);
+        return new org.springframework.security.core.userdetails.User(user.getEmail(), user.getPassword(), authorities);
     }
 }
