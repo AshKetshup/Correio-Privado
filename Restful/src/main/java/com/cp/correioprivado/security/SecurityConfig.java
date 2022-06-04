@@ -47,16 +47,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(STATELESS);
         http.addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
-        //http.authorizeRequests()
-        //        .anyRequest()
-        //        .hasRole("ADMIN");
         http.authorizeRequests()
                 .antMatchers(GET, "/api/topics")
                 .hasRole(ProducerRole);
 
         //GENERIC AUTHORIZATION
         http.authorizeRequests()
-                .antMatchers(GET, "/api/login")
+                .antMatchers(GET, "/login")
                 .permitAll();
         http.authorizeRequests()
                 .antMatchers(GET, "/api/news")
@@ -79,6 +76,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers(POST, "/api/topic_subscribed/subscribe")
                 .hasRole(ConsumerRole);
+
+//        http.authorizeRequests()
+//                .anyRequest()
+//                .denyAll();
 
     }
     @Bean

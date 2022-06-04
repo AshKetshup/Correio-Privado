@@ -55,9 +55,9 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authentication) throws IOException, ServletException {
-        //com.cp.correioprivado.dados.User localuser = (com.cp.correioprivado.dados.User) authentication.getPrincipal();
         User user = (User) authentication.getPrincipal();
-
+        log.info("Sucessful Authentication");
+        log.info("User principal is {}", user.getUsername());
         Algorithm algorithm = Algorithm.HMAC256(super_secret_seed_for_tokens.getBytes());
         String access_token = JWT.create()
                 .withSubject(user.getUsername())
