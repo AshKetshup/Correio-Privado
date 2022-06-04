@@ -99,20 +99,26 @@ public class UserResource {
         return ResponseEntity.created(uri).body(userService.saveRole(role));
     }
 
-    @PostMapping("/newsByTopic")
+    @GetMapping("/newsByTopic")
     public ResponseEntity<List<News>>getNewByTopic(@RequestBody String topic){
         return ResponseEntity.ok().body(userService.getNewsByTopic(topic));
     }
 
-    @PostMapping("/newsByUser")
+    @GetMapping("/newsByUser")
     public ResponseEntity<List<News>>getNewByTopic(@RequestBody Long id){
         return ResponseEntity.ok().body(userService.getNewsByUser(id));
     }
 
-    @PostMapping("/user/getRole")
-    public ResponseEntity<Role>getRoleByUsername(@RequestBody String username){
-        return ResponseEntity.ok().body(userService.getRoleByUser(username));
+    @GetMapping("/userByEmail")
+    public ResponseEntity<User>getUserByEmail(@RequestBody String email){
+        return ResponseEntity.ok().body(userService.getUserByEmail(email));
     }
+
+    @GetMapping("/user/getRole")
+    public ResponseEntity<Role>getRoleByEmail(@RequestBody String email){
+        return ResponseEntity.ok().body(userService.getRoleByUser(email));
+    }
+
 //    @PostMapping("/role/addtouser")
 //    public ResponseEntity<?>saveRole(@RequestBody RoleToUserForm form){
 //        userService.addRoleToUser(form.getUsername(), form.getRoleName());
@@ -144,12 +150,12 @@ public class UserResource {
     @PostMapping("/topic_subscribed/subscribe")
     public ResponseEntity<TopicSubscribed>subscribeTopic(@RequestBody TopicSubscribeForm form){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/topic_subscribed/subscribe").toUriString());
-        return ResponseEntity.created(uri).body(userService.subscribeTopic(form.getUsername(),form.getTitle()));
+        return ResponseEntity.created(uri).body(userService.subscribeTopic(form.getEmail(),form.getTitle()));
     }
 
     @DeleteMapping("/topic_subscribed/unsubscribe")
     public ResponseEntity<TopicSubscribeForm>removeTopicSubscribed(@RequestBody TopicSubscribeForm form){
-        userService.removeTopicSubscribed(form.getUsername(),form.getTitle());
+        userService.removeTopicSubscribed(form.getEmail(),form.getTitle());
         return ResponseEntity.ok(form);
     }
 
@@ -178,13 +184,13 @@ public class UserResource {
 
 @Data
 class RoleToUserForm {
-    private String username;
+    private String email;
     private String roleName;
 }
 
 @Data
 class TopicSubscribeForm{
-    private String username;
+    private String email;
     private String title;
 }
 

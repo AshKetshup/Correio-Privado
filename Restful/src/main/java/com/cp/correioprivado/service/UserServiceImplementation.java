@@ -87,8 +87,8 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     }
 
     @Override
-    public TopicSubscribed subscribeTopic(String username, String title){
-        User user = userRepo.findBySurname(username);
+    public TopicSubscribed subscribeTopic(String email, String title){
+        User user = userRepo.findByEmail(email);
         Topic topic = topicRepo.findByTitle(title);
         TopicSubscribed topic_subscribed = new TopicSubscribed(user,topic);
         log.info("Subscribing topic {} to user {}!", topic.getTitle(), user.getName());
@@ -96,15 +96,20 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     }
 
     @Override
-    public User getUser(String username) {
-        log.info("Getting user {}!",username);
-        return userRepo.findBySurname(username);
+    public User getUser(String email) {
+        log.info("Getting user {}!",email);
+        return userRepo.findByEmail(email);
     }
 
     @Override
     public User getUserById(Long id) {
         log.info("Getting user {}!", id);
         return userRepo.findById(id);
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepo.findByEmail(email);
     }
 
     @Override
@@ -138,8 +143,8 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     }
 
     @Override
-    public Role getRoleByUser(String username) {
-        return userRepo.findBySurname(username).getRole();
+    public Role getRoleByUser(String email) {
+        return userRepo.findByEmail(email).getRole();
     }
 
     @Override
@@ -159,8 +164,8 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     }
     
     @Override
-    public void removeTopicSubscribed(String username, String title){
-        User user = userRepo.findBySurname(username);
+    public void removeTopicSubscribed(String email, String title){
+        User user = userRepo.findByEmail(email);
         Topic topic = topicRepo.findByTitle(title);
         TopicSubscribed topicSubscribed = topicSubscribedRepo.findByTopicIdAndUserId(topic.getId(), user.getId());
         log.info("Deleting subscribed topic: {}!", topicSubscribed.getTopic().getTitle());
@@ -199,7 +204,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepo.findBySurname(username);
+        User user = userRepo.findByEmail(username);
         if(user == null) {
             log.error("User not Found");
             throw new UsernameNotFoundException("User not found in the db");
