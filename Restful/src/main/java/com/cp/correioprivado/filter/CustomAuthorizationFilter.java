@@ -21,6 +21,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -29,6 +32,9 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
 
     static final String super_secret_seed_for_tokens = "secret";
+
+    static final String pattern_matching_producer = "Produtor";
+    static final String pattern_matching_consumer = "Consumidor";
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -44,6 +50,14 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
                     DecodedJWT decodedJWT = verifier.verify(token);
                     String username = decodedJWT.getSubject();
                     String role = String.valueOf(decodedJWT.getClaim("role"));
+
+                    if(Pattern.compile(pattern_matching_producer, Pattern.CASE_INSENSITIVE).matcher(role).find()){
+                        role = "ROLE_PRODUTOR";
+                    } else if (Pattern.compile(pattern_matching_consumer, Pattern.CASE_INSENSITIVE).matcher(role).find()) {
+                        role = "ROLE_CONSUMIDOR";
+                    }
+
+                    log.info("user {} role is : {}", username, role);
                     Collection<SimpleGrantedAuthority> authority = new ArrayList<>();
                     authority.add(new SimpleGrantedAuthority(role));
                     UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username,null, authority);

@@ -24,8 +24,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final UserDetailsService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    static final String ProducerRole = "Produtor";
-    static final String ConsumerRole = "Consumidor";
+    static final String ProducerRole = "PRODUTOR";
+    static final String ConsumerRole = "CONSUMIDOR";
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception{
