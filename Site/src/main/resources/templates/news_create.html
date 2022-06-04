@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>Correio Privado - Profile</title>
+    <title>Correio Privado - Create News</title>
     <!-- Required meta tags -->
     <meta charset="utf-8">
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
@@ -14,6 +14,7 @@
     <script type="text/javascript" src="../js/mdb.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/js/bootstrap.bundle.min.js" integrity="sha384-pprn3073KE6tl6bjs2QrFaJGz5/SUsLqktiwsUTF55Jfv3qYSDhgCecCxMW52nD2" crossorigin="anonymous"></script>
     <script src="https://kit.fontawesome.com/539eca1b92.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/showdown@2.1.0/dist/showdown.min.js" crossorigin="anonymous"></script>
     <style>
         body {
             font-family: 'Inter', Arial !important;
@@ -88,114 +89,126 @@
                     </div>
                     <script>
                         let el_button = document.getElementById("toggler-button-menu");
-                        el_button.addEventListener("click",
-                            () => {
-                                let el = document.getElementById("toggler-icon-navbar");
+                        el_button.addEventListener("click", () => {
+                            let el = document.getElementById("toggler-icon-navbar");
 
-                                if (el_button.classList.contains("collapsed")) {
-                                    el.classList.remove("dropdown-menu-start");
-                                    el.classList.add("dropdown-menu-end");
-                                } else {
-                                    el.classList.remove("dropdown-menu-end");
-                                    el.classList.add("dropdown-menu-start");
-                                }
+                            if (el_button.classList.contains("collapsed")) {
+                                el.classList.remove("dropdown-menu-start");
+                                el.classList.add("dropdown-menu-end");
+                            } else {
+                                el.classList.remove("dropdown-menu-end");
+                                el.classList.add("dropdown-menu-start");
                             }
-                        );
+                        });
                     </script>
                 </div>
             </nav>
 
             <main class="my-5">
-                <h1 class="text-light fw-bold">Profile</h1>
+                <h1 class="text-light fw-bold" id="page_title">Create an Article</h1>
                 <hr class="text-light">
                 <div class="card text-center shadow-5-strong" style="
                     background: hsla(0, 0%, 30%, 0.7);
                     backdrop-filter: blur(10px);
                 ">
                     <div class="card-body px-4 py-5 px-md-5 d-flex flex-column gap-5">
-                        <div class="d-flex container justify-content-around align-items-center">
-                            <img src="../img/Diogo%20Simões.jpg" alt="" class="col-4 ratio-1x1 rounded-circle img-fluid" >
-                            <div class="col-4 ratio-1x1 text-light d-flex flex-column gap-2 text-start">
-                                <div class="row">
-                                    <h5 class="">Name</h5>
-                                    <p>Diogo Simões</p>
-                                </div>
-                                <div class="row d-flex flex-row ">
-                                    <h5 class="">E-Mail</h5>
-                                    <p class="">dsimoes2000@gmail.com</p>
-                                </div>
-                                <div class="row d-flex flex-row ">
-                                    <h5 class="">Rank</h5>
-                                    <p class="">Publisher</p>
+                        <div class="d-flex container justify-content-between align-items-start">
+                            <div class="w-100 text-light d-flex flex-column text-start">
+                                <style>
+                                    #content_preview * {
+                                        max-width: 100%;
+                                    }
+
+                                    #tabs .active {
+                                        color: white !important;
+                                    }
+                                </style>
+                                <ul class="nav nav-tabs mb-3" id="tabs" role="tablist">
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link active text-muted bg-transparent" id="content_edit_tab" data-mdb-toggle="tab" href="#content_edit" role="tab">
+                                            <i class="fas fa-pencil fa-fw me-2"></i> Edit
+                                        </a>
+                                    </li>
+                                    <li class="nav-item" role="presentation">
+                                        <a class="nav-link text-muted bg-transparent" id="content_preview_tab" data-mdb-toggle="tab" href="#content_preview" role="tab">
+                                            <i class="fas fa-image fa-fw me-2"></i> Preview
+                                        </a>
+                                    </li>
+                                </ul>
+                                <div class="tab-content" id="ex-with-icons-content">
+                                    <div class="tab-pane fade show active" role="tabpanel" id="content_edit">
+                                        <form id="" class="d-flex flex-column">
+                                            <div class="form-outline mb-3 col-12">
+                                                <select id="topic_id" class="form-control bg-white bg-opacity-10 py-2 text-light fw-light">
+                                                    <option class="text-muted invisible" disabled selected value>Topic</option>
+                                                    <option value="1" class="text-dark">Technology</option>
+                                                    <option value="2" class="text-dark">Gardening</option>
+                                                    <option value="3" class="text-dark">Literature</option>
+                                                </select>
+                                            </div>
+                                            <div class="form-outline mb-3 col-12">
+                                                <input type="text" id="title_id" class="form-control bg-white bg-opacity-10 py-2 text-light fw-light" autocomplete="off">
+                                                <label class="form-label text-light" for="title_id" style="margin-left: 0;">Title</label>
+                                            </div>
+                                            <div class="form-outline col-12 mb-3">
+                                                <textarea id="content_id" class="form-control bg-white bg-opacity-10 py-2 text-light fw-light" style="height: 500px !important;"></textarea>
+                                                <label class="form-label text-light" for="content_id" style="margin-left: 0;">Content</label>
+                                            </div>
+                                            <input type="submit" id="submit_btn" class="btn btn-primary disabled">
+                                        </form>
+                                    </div>
+                                    <div class="tab-pane fade" role="tabpanel" id="content_preview" style="min-height: 500px !important;"></div>
                                 </div>
                             </div>
-                        </div>
-                        <div class="container">
-                            <div id="btn_container" class="mb-3 text-end">
-                                <a href="topic_create.html" class="btn btn-primary ms-1">New Topic</a>
-                                <a href="news_create.html" class="btn btn-primary ms-1">New Article</a>
-                            </div>
-                            
-                            <table id="topics_table" class="table-responsive table align-middle mb-0 bg-white">
-                                <thead class="bg-light">
-                                    <tr>
-                                        <th class="text-start">News</th>
-                                        <th class="text-start">Topic</th>
-                                        <th>Date</th>
-                                        <th></th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <p class="fw-normal text-start mb-0">How a duck killed Elon Mush</p>
-                                        </td>
-                                        <td class="text-start">
-                                            <p class="fw-normal mb-1">Technology</p>
-                                            <p class="text-muted mb-0">News about Technology</p>
-                                        </td>
-                                        <td>4 days ago</td>
-                                        <td class="text-end">
-                                            <button type="button" class="btn btn-link btn-sm btn-rounded">
-                                                <i class="fa fa-arrow-right-long"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <p class="fw-normal text-start mb-0">How a duck used a hoe to kill Elon Mush</p>
-                                        </td>
-                                        <td class="text-start">
-                                            <p class="fw-normal mb-1">Gardening</p>
-                                            <p class="text-muted mb-0">Tips on how to git gud</p>
-                                        </td>
-                                        <td>5 days ago</td>
-                                        <td class="text-end">
-                                            <button type="button" class="btn btn-link btn-sm btn-rounded">
-                                                <i class="fa fa-arrow-right-long"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                    <tr>
-                                        <td>
-                                            <p class="fw-normal text-start mb-0">How I killed Elon Mush, the Duck perspective</p>
-                                        </td>
-                                        <td class="text-start">
-                                            <p class="fw-normal mb-1">Literature</p>
-                                            <p class="text-muted mb-0">News on people who write books</p>
-                                        </td>
-                                        <td>9 days ago</td>
-                                        <td class="text-end">
-                                            <button type="button" class="btn btn-link btn-sm btn-rounded">
-                                                <i class="fa fa-arrow-right-long"></i>
-                                            </button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
                         </div>
                     </div>
                 </div>
+                <script>
+                    document.getElementById("topic_id").addEventListener("change", () => {
+                        let selection = document.querySelectorAll("#topic_id > :not(option:first-child):checked");
+                        let submit_btn = document.getElementById("submit_btn");
+
+                        if (selection != "")
+                            submit_btn.classList.remove("disabled");
+                    });
+                </script>
+                <script>
+                    let converter = new showdown.Converter();
+                    let title = document.getElementById("page_title");
+                    let normal_content = title.innerText;
+
+                    document.getElementById("content_preview_tab").addEventListener("click", () => {
+                        let text = document.getElementById("content_id").value;
+                        text = text.split("\n")
+                            .map((el) => { return el.trim() })
+                            .join("\n");
+
+                        let title_content = document.getElementById("title_id").value.trim();
+                        if (title_content != "")
+                            title.innerText = title_content;
+
+                        document.getElementById("content_preview").innerHTML = converter.makeHtml(text);
+                    });
+
+                    document.getElementById("content_edit_tab").addEventListener("click", () => {
+                        title.innerText = normal_content;
+                    });
+                </script>
+                <script>
+                    document.getElementById('content_edit').addEventListener('keydown', (e) => {
+                        if (e.key == 'Tab') {
+                            e.preventDefault();
+                            var start = this.selectionStart;
+                            var end = this.selectionEnd;
+
+                            // set textarea value to: text before caret + tab + text after caret
+                            this.value = this.value.substring(0, start) + "\t" + this.value.substring(end);
+
+                            // put caret at right position again
+                            this.selectionStart = this.selectionEnd = start + 1;
+                        }
+                    });
+                </script>
             </main>
         </div>
     </div>
