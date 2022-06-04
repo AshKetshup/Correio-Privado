@@ -38,7 +38,7 @@ public class CorreioPrivadoApplication {
     PasswordEncoder passwordEncoder(){
         return new BCryptPasswordEncoder();
     }
-
+/*
     @Bean
     CommandLineRunner run(UserService userService){
         return args -> {
@@ -65,5 +65,5 @@ public class CorreioPrivadoApplication {
 
             userService.removeTopicSubscribed(userRepo.findByUsername("fernando").getUsername(),topicRepo.findByTitle("Festivais").getTitle());
         };
-    }
+    }*/
 }
