@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <title>Correio Privado - Filter News</title>
     <!-- Required meta tags -->
@@ -160,77 +160,16 @@
                                 </div>
                             </div>
                             <h3 class="mt-2">News:</h3>
-                            <div class="card bg-dark bg-opacity-50 w-100 px-2 pt-3 shadow-3-strong">
-                                <h3 class="text-start card-header fw-bold">How a duck killed Elon Mush</h3>
+                            <div th:each="article : ${ListArticles}" class="card bg-dark bg-opacity-50 w-100 px-2 pt-3 shadow-3-strong">
+                                <h3 th:text="${article.title}" class="text-start card-header fw-bold"></h3>
                                 <div class="card-body">
                                     <div class="d-flex justify-content-between">
-                                        <p class="text-capitalize">Technology</p>
-                                        <p class="text-capitalize">22/12/2022</p>
+                                        <p class="text-capitalize" th:text="${article.topic}"></p>
+                                        <p class="text-capitalize" th:text="${article.date}"></p>
                                     </div>
                                     <div class="d-flex justify-content-between">
-                                        <p class="text-capitalize">Diogo Simões</p>
-                                        <a class="btn btn-primary btn-rounded" href="">Read Article <i class="fas fa-arrow-right"></i></a>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="card bg-dark bg-opacity-50 w-100 px-2 pt-3 shadow-3-strong">
-                                <h3 class="text-start card-header fw-bold">How a duck killed Elon Mush</h3>
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <p class="text-capitalize">Technology</p>
-                                        <p class="text-capitalize">22/12/2022</p>
-                                    </div>
-                                    <div class="d-flex justify-content-between">
-                                        <p class="text-capitalize">Diogo Simões</p>
-                                        <a class="btn btn-primary btn-rounded" href="">Read Article <i class="fas fa-arrow-right"></i></a>
-                                    </div>
-                                </div>
-                            </div><div class="card bg-dark bg-opacity-50 w-100 px-2 pt-3 shadow-3-strong">
-                                <h3 class="text-start card-header fw-bold">How a duck killed Elon Mush</h3>
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <p class="text-capitalize">Technology</p>
-                                        <p class="text-capitalize">22/12/2022</p>
-                                    </div>
-                                    <div class="d-flex justify-content-between">
-                                        <p class="text-capitalize">Diogo Simões</p>
-                                        <a class="btn btn-primary btn-rounded" href="">Read Article <i class="fas fa-arrow-right"></i></a>
-                                    </div>
-                                </div>
-                            </div><div class="card bg-dark bg-opacity-50 w-100 px-2 pt-3 shadow-3-strong">
-                                <h3 class="text-start card-header fw-bold">How a duck killed Elon Mush</h3>
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <p class="text-capitalize">Technology</p>
-                                        <p class="text-capitalize">22/12/2022</p>
-                                    </div>
-                                    <div class="d-flex justify-content-between">
-                                        <p class="text-capitalize">Diogo Simões</p>
-                                        <a class="btn btn-primary btn-rounded" href="">Read Article <i class="fas fa-arrow-right"></i></a>
-                                    </div>
-                                </div>
-                            </div><div class="card bg-dark bg-opacity-50 w-100 px-2 pt-3 shadow-3-strong">
-                                <h3 class="text-start card-header fw-bold">How a duck killed Elon Mush</h3>
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <p class="text-capitalize">Technology</p>
-                                        <p class="text-capitalize">22/12/2022</p>
-                                    </div>
-                                    <div class="d-flex justify-content-between">
-                                        <p class="text-capitalize">Diogo Simões</p>
-                                        <a class="btn btn-primary btn-rounded" href="">Read Article <i class="fas fa-arrow-right"></i></a>
-                                    </div>
-                                </div>
-                            </div><div class="card bg-dark bg-opacity-50 w-100 px-2 pt-3 shadow-3-strong">
-                                <h3 class="text-start card-header fw-bold">How a duck killed Elon Mush</h3>
-                                <div class="card-body">
-                                    <div class="d-flex justify-content-between">
-                                        <p class="text-capitalize">Technology</p>
-                                        <p class="text-capitalize">22/12/2022</p>
-                                    </div>
-                                    <div class="d-flex justify-content-between">
-                                        <p class="text-capitalize">Diogo Simões</p>
-                                        <a class="btn btn-primary btn-rounded" href="">Read Article <i class="fas fa-arrow-right"></i></a>
+                                        <p class="text-capitalize" th:text="${article.author}"></p>
+                                        <a class="btn btn-primary btn-rounded" th:href="@{/news_viewer.html/{id}(id=${article.ID})}">Read Article <i class="fas fa-arrow-right"></i></a>
                                     </div>
                                 </div>
                             </div>
