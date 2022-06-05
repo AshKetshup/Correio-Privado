@@ -109,6 +109,11 @@ public class UserResource {
         return ResponseEntity.ok().body(userService.getNewsByUser(id));
     }
 
+    @GetMapping("/newsById")
+    public ResponseEntity<News>getNewById(@RequestBody Long id){
+        return ResponseEntity.ok().body(newsRepo.findById(id));
+    }
+
     @GetMapping("/userByEmail")
     public ResponseEntity<User>getUserByEmail(@RequestBody String email){
         return ResponseEntity.ok().body(userService.getUserByEmail(email));

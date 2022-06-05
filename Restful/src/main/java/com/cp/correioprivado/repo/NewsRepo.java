@@ -10,4 +10,5 @@ public interface NewsRepo extends JpaRepository<News,String> {
     News findByTitle(String title);
     List<News> findAllByTopicId(Long topicId);
     List<News> findAllByUser(User user);
+    News findById(Long id);
 }
