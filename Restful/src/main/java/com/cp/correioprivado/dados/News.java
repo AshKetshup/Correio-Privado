@@ -4,9 +4,7 @@ import lombok.*;
 
 import javax.persistence.*;
 
-import java.sql.Date;
-import java.util.List;
-
+import java.util.Date;
 @Entity
 @Data
 @NoArgsConstructor

@@ -18,6 +18,7 @@ import org.springframework.web.servlet.view.RedirectView;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -112,6 +113,17 @@ public class UserResource {
     @GetMapping("/newsById")
     public ResponseEntity<News>getNewById(@RequestBody Long id){
         return ResponseEntity.ok().body(newsRepo.findById(id));
+    }
+
+    @GetMapping("/newsBetweenDateByTopic")
+    public ResponseEntity<List<News>>getNewsBetweenDatesByTopic(@RequestBody Long topic, Date InitialDate, Date FinalDate){
+        List<News> news = newsRepo.findAllByTopicId(topic);
+        List<News> selectedNews = null;
+        for (int i = 0; i < news.size() ; i++) {
+            if(InitialDate.before(news.get(i).getReleaseDate()) && FinalDate.after(news.get(i).getReleaseDate()))
+                selectedNews.add(news.get(i));
+        }
+        return ResponseEntity.ok().body(selectedNews);
     }
 
     @GetMapping("/userByEmail")
