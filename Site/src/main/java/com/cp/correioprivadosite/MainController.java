@@ -1,6 +1,7 @@
 package com.cp.correioprivadosite;
 
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
@@ -9,8 +10,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,24 +28,28 @@ public class MainController{
         return null;
     }
 
-    @GetMapping(path="/login")
+    @GetMapping(path="/login.html")
     public String login(Model model) throws IOException  {
 
-        final String loginURI = restful+"/login";
+        final String newsURI = restful+"/login";
 
         RestTemplate restTemplate = new RestTemplate();
-
-        String response = restTemplate.postForObject(loginURI," ", String.class);
-
-        //send POST to /login to receive back verification tokens
-        URL restfulURL = new URL(restful);
-
-        HttpURLConnection connection = (HttpURLConnection) restfulURL.openConnection();
-        connection.setRequestMethod("POST");
 
         Map<String, String> parameters = new HashMap<>();
         parameters.put("username", "val");
         parameters.put("password", "val");
+
+        String response = restTemplate.postForObject(newsURI, "",String.class, parameters);
+
+        log.info("User tokens: {}", response);
+
+        try {
+            JSONObject result = new JSONObject(response.substring(1,response.length()-1));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
 
 
 
@@ -58,26 +61,18 @@ public class MainController{
         return null;
     }
     @GetMapping(path="/news.html")
-    public void news(Model model){
-        final String newsURI = restful+"/api/news";
+    public void news(Model model) {
+        final String newsURI = restful + "/api/news";
 
         RestTemplate restTemplate = new RestTemplate();
 
-        String response = restTemplate.getForObject(newsURI,String.class);
-
-        try {
-           JSONObject result = new JSONObject(response.substring(1,response.length()-1));
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-
-        log.info("News received object is {}", response);
+        String response = restTemplate.getForObject(newsURI, String.class);
 
 
+
+        log.debug("News received object is {}", response);
 
         model.addAttribute("ListArticles", response);
-
-
 
     }
 
