@@ -119,9 +119,9 @@ public class UserResource {
     public ResponseEntity<List<News>>getNewsBetweenDatesByTopic(@RequestBody Long topic, Date InitialDate, Date FinalDate){
         List<News> news = newsRepo.findAllByTopicId(topic);
         List<News> selectedNews = null;
-        for (int i = 0; i < news.size() ; i++) {
-            if(InitialDate.before(news.get(i).getReleaseDate()) && FinalDate.after(news.get(i).getReleaseDate()))
-                selectedNews.add(news.get(i));
+        for (News value : news) {
+            if (InitialDate.before(value.getReleaseDate()) && FinalDate.after(value.getReleaseDate()))
+                selectedNews.add(value);
         }
         return ResponseEntity.ok().body(selectedNews);
     }
