@@ -13,13 +13,11 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 
-
 @Controller @Slf4j
 public class MainController{
-
     private String restful = "http://localhost:8081";
-
-    @GetMapping(path="/index")
+    //Controller for the main page
+    @GetMapping(path="/index.html")
     public String index(Model model){
 
         //no honest idea what this needs from the server
@@ -27,7 +25,7 @@ public class MainController{
 
         return null;
     }
-
+    //Controller for the login page that sends the login info to the restAPI and then gets back the access token
     @GetMapping(path="/login.html")
     public String login(Model model) throws IOException  {
 
@@ -50,39 +48,35 @@ public class MainController{
         }
 
 
-
-
-
-
         //store tokens "somewhere"
-
-
 
         return null;
     }
+    //Controller for the main news page that receives all news from the restAPI
     @GetMapping(path="/news.html")
     public void news(Model model) {
+        log.info("News Controller triggered");
         final String newsURI = restful + "/api/news";
-
         RestTemplate restTemplate = new RestTemplate();
+        log.info("News Controller triggering /api/news from the RestAPI");
 
         String response = restTemplate.getForObject(newsURI, String.class);
 
+        JSONObject news = new JSONObject(response.substring(1, response.length()-1));
 
 
-        log.debug("News received object is {}", response);
 
-        model.addAttribute("ListArticles", response);
+        log.info("News received object is {}", news);
 
+        model.addAttribute("ListArticles", news);
     }
-
+    //Controller that generates a news article and sends it to the restAPI for storage
     @GetMapping(path="/news_create.html")
     public void news_create(Model model){
         //send POST to server to add news to /api/
 
-
     }
-
+    //Controller that displays the chosen news from /news.html to the user
     @GetMapping(path="/news_viewer.html")
     public String news_viewer(Model model) throws IOException {
         //query GET to server for news
@@ -102,7 +96,7 @@ public class MainController{
 
         return null;
     }
-
+    //Controller that gets the user info from the RestAPI and displays it to the user
     @GetMapping(path="/profile.html")
     public String profile(Model model){
 
@@ -126,7 +120,7 @@ public class MainController{
 
         return null;
     }
-
+    //Controller that sends a new user to be added to the User Database
     @GetMapping(path="/register.html")
     public String register(Model model){
 
@@ -150,7 +144,7 @@ public class MainController{
 
         return null;
     }
-
+    //Controller that displays all topics from the RestAPI
     @GetMapping(path="/topics.html")
     public String topics(Model model){
 
@@ -164,3 +158,4 @@ public class MainController{
         return null;
     }
 }
+
