@@ -24,7 +24,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    implementation 'jakarta.json:jakarta.json-api:2.1.0'
+    implementation 'org.json:json:20220320'
 }
 
 tasks.named('test') {

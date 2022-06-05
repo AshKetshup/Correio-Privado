@@ -1,11 +1,8 @@
 package com.cp.correioprivadosite;
 
-
-import jakarta.json.Json;
-import jakarta.json.JsonObject;
-import jakarta.json.JsonObjectBuilder;
-import jakarta.json.stream.JsonParser;
 import lombok.extern.slf4j.Slf4j;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -60,6 +57,30 @@ public class MainController{
 
         return null;
     }
+    @GetMapping(path="/news.html")
+    public void news(Model model){
+        final String newsURI = restful+"/api/news";
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        String response = restTemplate.getForObject(newsURI,String.class);
+
+        try {
+           JSONObject result = new JSONObject(response.substring(1,response.length()-1));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        log.info("News received object is {}", response);
+
+
+
+        model.addAttribute("ListArticles", response);
+
+
+
+    }
+
     @GetMapping(path="/news_create.html")
     public void news_create(Model model){
         //send POST to server to add news to /api/
@@ -75,9 +96,9 @@ public class MainController{
 
         RestTemplate restTemplate = new RestTemplate();
 
-        String response = restTemplate.getForObject(newsURI, String.class);
+        String response = restTemplate.getForObject(newsURI, String.class, "id to be defined");
 
-        
+
 
         //final JsonParser jaaaaason = Json.createParser(new StringReader(response));
 
