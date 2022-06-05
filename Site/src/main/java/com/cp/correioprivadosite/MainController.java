@@ -94,7 +94,6 @@ public class MainController{
         String response = restTemplate.getForObject(newsURI, String.class, "id to be defined");
 
 
-
         //final JsonParser jaaaaason = Json.createParser(new StringReader(response));
 
         //log.info("News received is: {}", jaaaaason);
@@ -108,7 +107,22 @@ public class MainController{
     public String profile(Model model){
 
         //query POST to server to get personal user info back
+        final String profileURI = restful + "/users";
 
+        RestTemplate restTemplate = new RestTemplate();
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("username", "val");
+        parameters.put("password", "val");
+
+        String response = restTemplate.postForObject(profileURI, "",String.class, parameters);
+
+        log.info("User tokens: {}", response);
+
+        try {
+            JSONObject result = new JSONObject(response.substring(1,response.length()-1));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         return null;
     }
@@ -117,6 +131,22 @@ public class MainController{
     public String register(Model model){
 
         //generate a POST to the server
+        final String registerURI = restful + "/users";
+
+        RestTemplate restTemplate = new RestTemplate();
+        Map<String, String> parameters = new HashMap<>();
+        parameters.put("username", "val");
+        parameters.put("password", "val");
+
+        String response = restTemplate.postForObject(registerURI, "",String.class, parameters);
+
+        log.info("User tokens: {}", response);
+
+        try {
+            JSONObject result = new JSONObject(response.substring(1,response.length()-1));
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
         return null;
     }
@@ -125,10 +155,12 @@ public class MainController{
     public String topics(Model model){
 
         //query a GET to the server
+        final String topicsURI = restful+"/api/topics";
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        String response = restTemplate.getForObject(topicsURI, String.class, "id to be defined");
 
         return null;
     }
-
-
-
 }
