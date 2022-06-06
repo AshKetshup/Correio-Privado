@@ -35,8 +35,8 @@ public interface UserService {
     void removeTopic(String title);
 
     // TOPIC_SUBSCRIBED
-    TopicSubscribed subscribeTopic(String username, String topic);
-    void removeTopicSubscribed(String username, String title);
+    TopicSubscribed subscribeTopic(String email, String topic);
+    void removeTopicSubscribed(String email, String title);
     List<TopicSubscribed> getTopicSubscribed();
     List<TopicSubscribed> getTopicsSubscribedByUser(Long id);
 

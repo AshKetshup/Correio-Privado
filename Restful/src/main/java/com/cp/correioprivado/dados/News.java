@@ -1,5 +1,6 @@
 package com.cp.correioprivado.dados;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 
 import javax.persistence.*;
@@ -20,6 +21,7 @@ public class News {
     @NonNull
     private String content;
     @NonNull
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm a z")
     private Date releaseDate;
     @NonNull
     @ManyToOne()

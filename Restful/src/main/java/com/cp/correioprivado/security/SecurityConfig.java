@@ -49,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         http.authorizeRequests()
                 .antMatchers(GET, "/api/topics")
-                .hasRole(ProducerRole);
+                .permitAll();
 
         //GENERIC AUTHORIZATION
         http.authorizeRequests()

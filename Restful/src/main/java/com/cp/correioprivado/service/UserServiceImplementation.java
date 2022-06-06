@@ -62,7 +62,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         log.info("Saving new news {} to the database!", news.getTitle());
 
         List<TopicSubscribed> listSubscriptions = topicSubscribedRepo.findAllByTopicId(news.getTopic().getId());
-        for(int i = 0; i < listSubscriptions.size(); i++){
+        for (int i = 0; i < listSubscriptions.size(); i++) {
             saveNotification(new Notifications(
                     "Notícia nova no tópico: " + news.getTopic().getTitle(), false, news, listSubscriptions.get(i).getUser()));
         }
@@ -90,7 +90,7 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     public TopicSubscribed subscribeTopic(String email, String title){
         User user = userRepo.findByEmail(email);
         Topic topic = topicRepo.findByTitle(title);
-        TopicSubscribed topic_subscribed = new TopicSubscribed(user,topic);
+        TopicSubscribed topic_subscribed = new TopicSubscribed(user, topic);
         log.info("Subscribing topic {} to user {}!", topic.getTitle(), user.getName());
         return topicSubscribedRepo.save(topic_subscribed);
     }
