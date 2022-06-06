@@ -2,6 +2,7 @@ package com.cp.correioprivado.api;
 
 import com.cp.correioprivado.dados.*;
 import com.cp.correioprivado.repo.NewsRepo;
+import com.cp.correioprivado.repo.TopicRepo;
 import com.cp.correioprivado.repo.UserRepo;
 import com.cp.correioprivado.service.UserService;
 import com.sun.nio.sctp.Notification;
@@ -29,6 +30,7 @@ public class UserResource {
     private final UserService userService;
     private final UserRepo userRepo;
     private final NewsRepo newsRepo;
+    private final TopicRepo topicRepo;
 
     @GetMapping("/users")
     public ResponseEntity<List<User>>getUsers(){
@@ -143,9 +145,12 @@ public class UserResource {
 //    }
 
     @PostMapping("/news/save")
-    public RedirectView saveNews(News news,
+    public RedirectView saveNews(String title, String content, String email, String topic,
         @RequestParam("image") MultipartFile multipartFile) throws IOException {
-            if(multipartFile != null)
+
+        News news = new News(title,content,new Date(),userRepo.findByEmail(email),topicRepo.findByTitle(topic));
+
+        if(multipartFile != null)
                 userService.saveNews(news, multipartFile);
             else
                 userService.saveNews(news);
