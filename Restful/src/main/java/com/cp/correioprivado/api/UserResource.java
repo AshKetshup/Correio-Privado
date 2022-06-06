@@ -152,17 +152,12 @@ public class UserResource {
 //    }
 
     @PostMapping("/news/save")
-<<<<<<< Updated upstream
     public RedirectView saveNews(String title, String content, String email, String topic,
         @RequestParam("image") MultipartFile multipartFile) throws IOException {
 
         News news = new News(title,content,new Date(),userRepo.findByEmail(email),topicRepo.findByTitle(topic));
 
         if(multipartFile != null)
-=======
-    public RedirectView saveNews(News news, @RequestParam("image") MultipartFile multipartFile) throws IOException {
-            if(multipartFile != null)
->>>>>>> Stashed changes
                 userService.saveNews(news, multipartFile);
             else
                 userService.saveNews(news);
