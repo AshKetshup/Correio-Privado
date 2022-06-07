@@ -6,7 +6,6 @@ import com.cp.correioprivado.repo.RoleRepo;
 import com.cp.correioprivado.repo.TopicRepo;
 import com.cp.correioprivado.repo.UserRepo;
 import com.cp.correioprivado.service.UserService;
-import com.sun.nio.sctp.Notification;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Not;
@@ -18,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.management.Notification;
 import java.io.IOException;
 import java.net.URI;
 import java.util.Date;
@@ -102,7 +102,10 @@ public class UserResource {
 
 
     @PostMapping("/role/save")
-    public ResponseEntity<Role>saveRole(@RequestBody Role role){
+    public ResponseEntity<Role>saveRole(@RequestBody String title, String description){
+
+        Role role = new Role(title, description);
+
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/role/save").toUriString());
         return ResponseEntity.created(uri).body(userService.saveRole(role));
     }
@@ -163,7 +166,10 @@ public class UserResource {
     }
 
     @PostMapping("/topic/save")
-    public ResponseEntity<Topic>saveTopic(@RequestBody Topic topic){
+    public ResponseEntity<Topic>saveTopic(@RequestBody String title, String description){
+
+        Topic topic = new Topic(title,description);
+
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/topic/save").toUriString());
         return ResponseEntity.created(uri).body(userService.saveTopic(topic));
     }
@@ -192,7 +198,9 @@ public class UserResource {
     }
 
     @PostMapping("/notifications/save")
-    public ResponseEntity<Notifications>saveNotifications(@RequestBody Notifications notification){
+    public ResponseEntity<Notifications>saveNotifications(@RequestBody String message, long idnews, long iduser){
+
+        Notifications notification = new Notifications(message,false, newsRepo.findById(idnews), userRepo.findById(iduser));
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/notifications/save").toUriString());
         return ResponseEntity.created(uri).body(userService.saveNotification(notification));
     }
