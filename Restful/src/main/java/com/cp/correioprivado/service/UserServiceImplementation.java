@@ -37,20 +37,6 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     private EmailSenderService emailSenderService;
 
     private final TopicSubscribedRepo topicSubscribedRepo;
-    @Override
-    public User saveUser(User user, MultipartFile multipartFile) throws IOException {
-
-        String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
-        user.setPhoto(fileName);
-        User savedUser = userRepo.save(user);
-        log.info("Saving new photo {} to the database!", fileName);
-        String uploadDir = "user-photos/" + savedUser.getId();
-        FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-
-        log.info("Saving new user {} to the database!", user.getName());
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        return savedUser;
-    }
 
     @Override
     public User saveUser(User user) {
@@ -80,17 +66,6 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
             );
         }
         return newsRepo.save(news);
-    }
-
-    @Override
-    public News saveNews(News news, MultipartFile multipartFile) throws IOException {
-        String fileName = StringUtils.cleanPath(Objects.requireNonNull(multipartFile.getOriginalFilename()));
-        news.setPhoto(fileName);
-        News savedNews = newsRepo.save(news);
-        log.info("Saving new photo {} to the database!", fileName);
-        String uploadDir = "news-photos/" + savedNews.getId();
-        FileUploadUtil.saveFile(uploadDir, fileName, multipartFile);
-        return savedNews;
     }
 
     @Override

@@ -21,8 +21,53 @@ import java.util.*;
 
 @Controller @Slf4j
 public class MainController {
-    private final String restful = "http://vmi827195.contaboserver.net:8080";
+    private final String restful = "http://localhost:8081";
     private final String accessToken = "access_token";
+    private final String userNameCookieName = "username";
+    private final String userRoleCookieName = "role";
+
+    public Response queryRESTful (String mediaTypeString,
+                                  String bodyString,
+                                  String uri,
+                                  String method,
+                                  String headerType,
+                                  String headerBody){
+
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
+        MediaType mediaType = MediaType.parse(mediaTypeString);
+        RequestBody body = RequestBody.create(mediaType, bodyString);
+        Request request = new Request.Builder()
+                .url(uri)
+                .method(method, body)
+                .addHeader(headerType, headerBody)
+                .build();
+        //Receive the response to the the attemped login
+        try {
+            return client.newCall(request).execute();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+    public Response queryRestfulGET(String uri){
+
+        OkHttpClient client = new OkHttpClient().newBuilder()
+                .build();
+        MediaType mediaType = MediaType.parse("text/plain");
+        Request request = new Request.Builder()
+                .url(uri)
+                .get()
+                .build();
+        try {
+            return client.newCall(request).execute();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+    }
+
+
     //Controller for the main page
     @GetMapping(path="/")
     public String index(Model model, HttpServletRequest webRequest, HttpServletResponse webResponse){
@@ -40,6 +85,11 @@ public class MainController {
                     String accessTokenValue = userCookies[i].getValue();
                     break;
                 }
+                if (userCookies[i].getName() == userNameCookieName){
+                    log.info("Username found: {}", userCookies[i].getValue());
+                    String username = userCookies[i].getValue();
+                }
+
             }
 
         }
@@ -61,12 +111,12 @@ public class MainController {
         }else {
             log.info("Found {} Cookies", userCookies.length);
             for(int i = 0; i < userCookies.length ; i++){
-                if (userCookies[i].getName() == accessToken){
+                if (userCookies[i].getName().equals(accessToken)){
                     log.info("Access token found: {}", userCookies[i].getValue());
                     String accessTokenValue = userCookies[i].getValue();
                     return "redirect:/";
                 }
-                log.info("Cookie {}: {} -> {}", i, userCookies[i].getName(), userCookies[i].getValue());
+                log.info("Cookie {}:{}-> {}", i, userCookies[i].getName(), userCookies[i].getValue());
             }
             log.info("No access token was found");
             model.addAttribute("loginInfo", new LoginForm());
@@ -85,16 +135,14 @@ public class MainController {
         log.info("username is {} and password is {}", username, password);
 
         //Generate HTTP Request to the API to send the credentials
-        OkHttpClient client = new OkHttpClient().newBuilder().build();
-        MediaType mediaType = MediaType.parse("application/x-www-form-urlencoded");
-        RequestBody body = RequestBody.create(mediaType, "username=" + username + "&password=" + password);
-        Request request = new Request.Builder()
-                .url(loginURI)
-                .method("POST", body)
-                .addHeader("Content-Type", "application/x-www-form-urlencoded")
-                .build();
-        //Receive the response to the the attemped login
-        Response response = client.newCall(request).execute();
+
+        Response response = queryRESTful("application/x-www-form-urlencoded",
+                "username=" + username + "&password=" + password,
+                loginURI,
+                "POST",
+                "Content-Type",
+                "application/x-www-form-urlencoded");
+
         if (response.code() == 200){
             log.info("The server responded to the the login attempt with: {}", response);
             //Store the received token in a JSON object
@@ -102,6 +150,21 @@ public class MainController {
             JSONObject token = new JSONObject(jsonToken);
             //Store the token in a cookie
             Cookie userTokenCookie = new Cookie(accessToken, token.getString("access_token"));
+
+            //TODO: GET user profile to load name and role into cookies
+
+            Response userInfo = queryRESTful("application/x-www-form-urlencoded",
+                    "username=" + username + "&password=" + password,
+                    loginURI,
+                    "POST",
+                    "Content-Type",
+                    "application/x-www-form-urlencoded");
+
+            String usernameRESTful = "Test name";
+            String userroleRestful = "Test role";
+
+            Cookie userNameCookie = new Cookie(userNameCookieName, usernameRESTful);
+            Cookie userRoleCookie = new Cookie(userRoleCookieName, userroleRestful);
             userTokenCookie.setMaxAge(10 * 60); //it's in seconds
             webResponse.addCookie(userTokenCookie);
             return "redirect:/";
@@ -112,9 +175,11 @@ public class MainController {
     @GetMapping(path="/news")
     public String news(
             Model model,
+            HttpServletRequest webRequest,
+            HttpServletResponse webResponse,
             @RequestParam(required = false) Long topicID,
-            @RequestParam(required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date startDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern="yyyy-MM-dd") Date endDate) {
+            @RequestParam(required = false) @DateTimeFormat(pattern="yyyy/MM/dd") Date startDate,
+            @RequestParam(required = false) @DateTimeFormat(pattern="yyyy/MM/dd") Date endDate) {
         log.info("User is in news");
         RestTemplate restTemplate = new RestTemplate();
 
@@ -157,7 +222,9 @@ public class MainController {
     }
     //Controller that generates a news article and sends it to the restAPI for storage
     @GetMapping(path="/news_create")
-    public String news_create(Model model){
+    public String news_create(Model model,
+                              HttpServletRequest webRequest,
+                              HttpServletResponse webResponse){
         //send POST to server to add news to /api/
         log.info("User is in news_create");
 
@@ -168,7 +235,9 @@ public class MainController {
 
     //Controller that displays the chosen news from /news.html to the user
     @GetMapping(path="/news_viewer")
-    public String news_viewer(Model model) {
+    public String news_viewer(Model model,
+                              HttpServletRequest webRequest,
+                              HttpServletResponse webResponse) {
         //query GET to server for news
         log.info("User is in news_viewer");
 
@@ -177,7 +246,9 @@ public class MainController {
 
     //Controller that gets the user info from the RestAPI and displays it to the user
     @GetMapping(path="/profile")
-    public String profile(Model model) throws JSONException{
+    public String profile(Model model,
+                          HttpServletRequest webRequest,
+                          HttpServletResponse webResponse) throws JSONException{
         log.info("User is in profile");
         //query POST to server to get personal user info back
         final String profileURI = restful + "/users";
@@ -198,7 +269,9 @@ public class MainController {
 
     //Controller that sends a new user to be added to the User Database
     @GetMapping(path="/register.html")
-    public String register(Model model) {
+    public String register(Model model,
+                           HttpServletRequest webRequest,
+                           HttpServletResponse webResponse) {
         log.info("User is in register");
         //Does this work?
 
@@ -209,12 +282,14 @@ public class MainController {
 
     @GetMapping("/registerInfo")
     public String registerInfo(Model model,
-        @RequestParam int role,
-        @RequestParam String firstname,
-        @RequestParam String lastname,
-        @RequestParam String email,
-        @RequestParam String password,
-        @RequestParam String confirmedPassword
+                               HttpServletRequest webRequest,
+                               HttpServletResponse webResponse,
+                               @RequestParam int role,
+                                @RequestParam String firstname,
+                                @RequestParam String lastname,
+                                @RequestParam String email,
+                                @RequestParam String password,
+                                @RequestParam String confirmedPassword
     ) throws IOException {
         final String registerURI = restful + "/api/user/save";
         log.info("User Details are: {};{};{};{};{};{}",role,firstname,lastname,email,password,confirmedPassword);
@@ -283,7 +358,9 @@ public class MainController {
 
     //Controller that displays all topics from the RestAPI
     @GetMapping(path="/topics")
-    public String topics(Model model){
+    public String topics(Model model,
+                         HttpServletRequest webRequest,
+                         HttpServletResponse webResponse) throws IOException{
         log.info("User is in topics");
         RestTemplate restTemplate = new RestTemplate();
         //query a GET to the server
@@ -291,14 +368,22 @@ public class MainController {
 
         List<Topic> listTopics = new ArrayList<>();
         String n = restTemplate.getForObject(topicsURI, String.class);
-        JSONArray topics = new JSONArray(n);
 
-        for (int i = 0; i < topics.length(); i++) {
-            Topic topic = new Topic((JSONObject) topics.get(i));
+
+        Response topics = queryRestfulGET(topicsURI);
+
+        log.info("Recieves topics are: {}", topics.body().string());
+
+        JSONArray topicsJSON = new JSONArray(topics.body().string());
+
+        for (var object : topicsJSON) {
+            Topic topic = new Topic((JSONObject) object);
             listTopics.add(topic);
         }
 
-        return "redirect:/topics";
+        model.addAttribute("Insert thymeleaf object name here", listTopics);
+
+        return "/topics";
     }
 }
 
