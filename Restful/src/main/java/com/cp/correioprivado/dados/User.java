@@ -22,12 +22,4 @@ public class User {
     @ManyToOne()
     @JoinColumn(name = "roleId")
     private Role role;
-    @Column(nullable = true, length = 64)
-    private String photo;
-
-    public String getPhotoImagePath() {
-        if (photo == null || id == null) return null;
-
-        return "/user-photos/" + id + "/" + photo;
-    }
 }

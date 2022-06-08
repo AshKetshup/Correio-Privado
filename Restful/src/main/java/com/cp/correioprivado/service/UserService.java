@@ -10,7 +10,6 @@ public interface UserService {
 
     // USER
     User saveUser(User user);
-    User saveUser(User user, MultipartFile multipartFile) throws IOException;
     List<User> getUsers();
     User getUser(String username);
     User getUserById(Long id);
@@ -23,7 +22,6 @@ public interface UserService {
 
     // NEWS
     News saveNews(News news);
-    News saveNews(News news, MultipartFile multipartFile) throws IOException;
     List<News> getNews();
     News getNewsByTitle(String title);
     List<News> getNewsByTopic(String topic);
