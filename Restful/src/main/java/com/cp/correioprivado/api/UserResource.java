@@ -6,24 +6,18 @@ import com.cp.correioprivado.repo.RoleRepo;
 import com.cp.correioprivado.repo.TopicRepo;
 import com.cp.correioprivado.repo.UserRepo;
 import com.cp.correioprivado.service.UserService;
-import lombok.Data;
 import lombok.RequiredArgsConstructor;
-import org.aspectj.weaver.ast.Not;
-import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.RedirectView;
 
-import javax.management.Notification;
 import java.io.IOException;
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api")
@@ -65,14 +59,10 @@ public class UserResource {
         return ResponseEntity.ok().body(userService.getNews());
     }
 
-//    @PostMapping("/user/save")
-//    public ResponseEntity<User>saveUser(@RequestParam User user){
-//        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
-//        return ResponseEntity.created(uri).body(userService.saveUser(user));
-//    }
-
     @PostMapping("/user/save")
-    public RedirectView saveUser(String name, String surname, String email, String password, String role) throws IOException {
+    public RedirectView saveUser(@RequestBody String name, @RequestBody String surname,
+                                 @RequestBody String email, @RequestBody String password,
+                                 @RequestBody String role) {
 
         User user = new User(name, surname, email, password, roleRepo.findByName(role));
         userService.saveUser(user);
@@ -80,7 +70,7 @@ public class UserResource {
     }
 
     @PostMapping("/role/save")
-    public ResponseEntity<Role> saveRole(@RequestParam String title, String description) {
+    public ResponseEntity<Role> saveRole(@RequestBody String title, @RequestBody String description) {
 
         Role role = new Role(title, description);
 
@@ -104,12 +94,21 @@ public class UserResource {
     }
 
     @GetMapping("/newsBetweenDateByTopic")
-    public ResponseEntity<List<News>> getNewsBetweenDatesByTopic(@RequestParam String topicid, @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss") Date InitialDate, @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss") Date FinalDate) {
+    public ResponseEntity<List<News>> getNewsBetweenDatesByTopic(@RequestParam String topicid,
+                                                                 @RequestParam String InitialDateString,
+                                                                 @RequestParam String FinalDateString)
+                                                                 throws ParseException {
+        SimpleDateFormat holder = new SimpleDateFormat("yyyy/MM/dd hh:mm:ss");
+        Date InitialDate = holder.parse(InitialDateString);
+        Date FinalDate = holder.parse(FinalDateString);
+
         List<News> news = newsRepo.findAllByTopicId(Long.parseLong(topicid));
         List<News> selectedNews = null;
         for (News value : news) {
-            if (InitialDate.before(value.getReleaseDate()) && FinalDate.after(value.getReleaseDate()))
+            if (InitialDate.before(value.getReleaseDate()) && FinalDate.after(value.getReleaseDate())) {
+                assert selectedNews != null;
                 selectedNews.add(value);
+            }
         }
         return ResponseEntity.ok().body(selectedNews);
     }
@@ -124,14 +123,9 @@ public class UserResource {
         return ResponseEntity.ok().body(userService.getRoleByUser(email));
     }
 
-//    @PostMapping("/role/addtouser")
-//    public ResponseEntity<?>saveRole(@RequestParam RoleToUserForm form){
-//        userService.addRoleToUser(form.getUsername(), form.getRoleName());
-//        return ResponseEntity.ok().build();
-//    }
-
     @PostMapping("/news/save")
-    public RedirectView saveNews(String title, String content, String email, String topic) throws IOException {
+    public RedirectView saveNews(@RequestBody String title, @RequestBody String content,
+                                 @RequestBody String email, @RequestBody String topic) {
 
         News news = new News(title, content, new Date(), userRepo.findByEmail(email), topicRepo.findByTitle(topic));
         userService.saveNews(news);
@@ -139,7 +133,8 @@ public class UserResource {
     }
 
     @PostMapping("/topic/save")
-    public ResponseEntity<Topic> saveTopic(@RequestParam String title, String description) {
+    public ResponseEntity<Topic> saveTopic(@RequestBody String title,
+                                           @RequestBody String description) {
 
         Topic topic = new Topic(title, description);
 
@@ -154,13 +149,15 @@ public class UserResource {
     }
 
     @PostMapping("/topic_subscribed/subscribe")
-    public ResponseEntity<TopicSubscribed> subscribeTopic(@RequestParam String email, String title) {
+    public ResponseEntity<TopicSubscribed> subscribeTopic(@RequestParam String email,
+                                                          @RequestBody String title) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/topic_subscribed/subscribe").toUriString());
         return ResponseEntity.created(uri).body(userService.subscribeTopic(email, title));
     }
 
     @DeleteMapping("/topic_subscribed/unsubscribe")
-    public ResponseEntity<String> removeTopicSubscribed(@RequestParam String email, String title) {
+    public ResponseEntity<String> removeTopicSubscribed(@RequestParam String email,
+                                                        @RequestBody String title) {
         userService.removeTopicSubscribed(email, title);
         return ResponseEntity.ok(title);
     }
@@ -171,7 +168,9 @@ public class UserResource {
     }
 
     @PostMapping("/notifications/save")
-    public ResponseEntity<Notifications> saveNotifications(@RequestParam String message, String idnews, String iduser) {
+    public ResponseEntity<Notifications> saveNotifications(@RequestParam String message,
+                                                           @RequestBody String idnews,
+                                                           @RequestBody String iduser) {
 
         Notifications notification = new Notifications(message, false, newsRepo.findById(Long.parseLong(idnews)), userRepo.findById(Long.parseLong(iduser)));
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/notifications/save").toUriString());

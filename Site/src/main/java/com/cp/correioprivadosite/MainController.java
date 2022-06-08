@@ -99,15 +99,17 @@ public class MainController {
     }
     public Response queryUserInfo(String userEmail, String userToken){
 
+        String url = restful+"/api/userByEmail?email="+userEmail;
+        log.info("Querying {} for user info", url);
+
         OkHttpClient client = new OkHttpClient().newBuilder()
                 .build();
         MediaType mediaType = MediaType.parse("text/plain");
-        RequestBody body = RequestBody.create(mediaType, "email="+userEmail);
+        RequestBody body = RequestBody.create(mediaType, "");
         Request request = new Request.Builder()
-                .url(restful+"/userByEmail")
-                .method("POST", body)
-                .addHeader("Authorization", "Bearer "+userToken)
-                .addHeader("Content-Type", "text/plain")
+                .url(url)
+                .get()
+                .addHeader("Authorization", "Bearer " + userToken)
                 .build();
         try {
             return client.newCall(request).execute();
@@ -188,17 +190,20 @@ public class MainController {
             log.info("The server responded to the the login attempt with: {}", response);
             //Store the received token in a JSON object
             JSONObject token = new JSONObject(response.body().string());
+            log.info("User token is: {}", token);
 
             //This username is actually the user's email.
             Response userInfo = queryUserInfo(username, token.getString("access_token"));
             log.info("User info is: {}", userInfo.body().string());
 
-            String userInfoString = userInfo.body().string();
-            JSONObject userInfoJSON = new JSONObject(userInfoString);
+            JSONObject userJSON = new JSONObject(userInfo.body().string());
+            log.info("user info  is: {}", userJSON);
+
+            User user = new User(userJSON);
 
             Cookie userTokenCookie = new Cookie(accessToken, token.getString("access_token"));
-            Cookie userName = new Cookie(userNameCookieName, userInfoJSON.getString("firstname"));
-            Cookie userRole = new Cookie(userRoleCookieName, userInfoJSON.getJSONObject("role").getString("name"));
+            Cookie userName = new Cookie(userNameCookieName, user.getName()+" "+user.getSurname());
+            Cookie userRole = new Cookie(userRoleCookieName, user.getRole().getName());
 
             userTokenCookie.setMaxAge(30/*minutes*/ * 60/*seconds*/);
             userName.setMaxAge(30/*minutes*/ * 60/*seconds*/);
@@ -206,7 +211,6 @@ public class MainController {
             webResponse.addCookie(userTokenCookie);
             webResponse.addCookie(userName);
             webResponse.addCookie(userRole);
-
 
             return "redirect:/";
         } else {
