@@ -4,25 +4,33 @@ import com.cp.correioprivado.dados.News;
 import com.cp.correioprivado.dados.Role;
 import com.cp.correioprivado.dados.Topic;
 import com.cp.correioprivado.dados.User;
+import com.cp.correioprivado.email.EmailSenderService;
 import com.cp.correioprivado.repo.RoleRepo;
 import com.cp.correioprivado.repo.TopicRepo;
 import com.cp.correioprivado.repo.UserRepo;
 import com.cp.correioprivado.service.UserService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.Date;
-import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 
+@Slf4j
 @SpringBootApplication
 public class CorreioPrivadoApplication {
+    private final UserRepo userRepo;
+    private final RoleRepo roleRepo;
+    private final TopicRepo topicRepo;
 
-    public CorreioPrivadoApplication(UserRepo userRepo, RoleRepo roleRepo, TopicRepo topicRepo) {
+    public CorreioPrivadoApplication(EmailSenderService emailSenderService, UserRepo userRepo, RoleRepo roleRepo, TopicRepo topicRepo) {
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.topicRepo = topicRepo;
@@ -31,10 +39,6 @@ public class CorreioPrivadoApplication {
     public static void main(String[] args) {
         SpringApplication.run(CorreioPrivadoApplication.class, args);
     }
-
-    private final UserRepo userRepo;
-    private final RoleRepo roleRepo;
-    private final TopicRepo topicRepo;
 
     @Bean
     PasswordEncoder passwordEncoder(){
@@ -69,9 +73,9 @@ public class CorreioPrivadoApplication {
 
             userService.saveUser(
                 new User(
-                    "Jacinto Meireles",
-                    "meireles",
-                    "jacinto@meireles.pt",
+                    "Jacinto",
+                    "Meireles",
+                    "dsimoes2000@gmail.com",
                     "1234",
                     roleRepo.findByName("Consumidor")
                 )
@@ -81,7 +85,7 @@ public class CorreioPrivadoApplication {
                 new User(
                     "José Lopes da Silva",
                     "lopesdasilva",
-                    "jose@lopesdasilva.pt",
+                    "diogoc.simoes@gmail.com",
                     "1234",
                     roleRepo.findByName("Produtor")
                 )
@@ -93,12 +97,12 @@ public class CorreioPrivadoApplication {
             userService.saveTopic(new Topic("Romarias e Feiras","Romarias e feiras por todo o país"));
 
             userService.subscribeTopic(
-                userRepo.findByEmail("jacinto@meireles.pt").getEmail(),
+                userRepo.findByEmail("dsimoes2000@gmail.com").getEmail(),
                 topicRepo.findByTitle("Desporto").getTitle()
             );
 
             userService.subscribeTopic(
-                userRepo.findByEmail("fernando@fonseca.pt").getEmail(),
+                userRepo.findByEmail("diogoc.simoes@gmail.com").getEmail(),
                 topicRepo.findByTitle("Festivais").getTitle()
             );
 
@@ -112,19 +116,19 @@ public class CorreioPrivadoApplication {
                 )
             );
 
-            TimeUnit.SECONDS.sleep(30);
+            TimeUnit.SECONDS.sleep(5);
 
             userService.saveNews(
                 new News(
                     "Festival de Coimbra",
                     "Coimbra terá um novo festival",
                     new Date(),
-                    userRepo.findByEmail("jose@lopesdasilva.pt"),
+                    userRepo.findByEmail("diogoc.simoes@gmail.com"),
                     topicRepo.findByTitle("Festivais")
                 )
             );
 
-            TimeUnit.SECONDS.sleep(30);
+            TimeUnit.SECONDS.sleep(5);
 
 
             userService.saveNews(
@@ -137,19 +141,20 @@ public class CorreioPrivadoApplication {
                 )
             );
 
-            TimeUnit.SECONDS.sleep(30);
+            TimeUnit.SECONDS.sleep(5);
 
             userService.saveNews(
                 new News(
                     "Feira Municipal",
                     "Feira municipal a decorrer em Odemira",
                     new Date(),
-                    userRepo.findByEmail("jose@lopesdasilva.pt"),
+                    userRepo.findByEmail("dsimoes2000@gmail.com"),
                     topicRepo.findByTitle("Romarias e Feiras")
                 )
             );
 
             // userService.removeTopicSubscribed(userRepo.findByUsername("fernando").getUsername(),topicRepo.findByTitle("Festivais").getTitle());
+            log.info("Reached end of pre-filled data...");
         };
     }*/
 }
