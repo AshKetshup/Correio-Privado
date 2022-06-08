@@ -1,6 +1,7 @@
 package com.cp.correioprivado.dados;
 
 import lombok.*;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
 
@@ -20,6 +21,7 @@ public class News {
     @NonNull
     private String content;
     @NonNull
+    @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss")
     private Date releaseDate;
     @NonNull
     @ManyToOne()

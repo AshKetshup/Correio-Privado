@@ -9,6 +9,7 @@ import com.cp.correioprivado.service.UserService;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.aspectj.weaver.ast.Not;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
@@ -103,7 +104,7 @@ public class UserResource {
     }
 
     @GetMapping("/newsBetweenDateByTopic")
-    public ResponseEntity<List<News>> getNewsBetweenDatesByTopic(@RequestBody String topicid, Date InitialDate, Date FinalDate) {
+    public ResponseEntity<List<News>> getNewsBetweenDatesByTopic(@RequestBody String topicid, @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss") Date InitialDate, @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss") Date FinalDate) {
         List<News> news = newsRepo.findAllByTopicId(Long.parseLong(topicid));
         List<News> selectedNews = null;
         for (News value : news) {
