@@ -1,9 +1,13 @@
 package com.cp.correioprivado.service;
 
 import com.cp.correioprivado.dados.*;
+import com.cp.correioprivado.email.EmailSenderService;
 import com.cp.correioprivado.repo.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -28,6 +32,9 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     private final TopicRepo topicRepo;
     private final PasswordEncoder passwordEncoder;
     private final NotificationsRepo notificationsRepo;
+
+    @Autowired
+    private EmailSenderService emailSenderService;
 
     private final TopicSubscribedRepo topicSubscribedRepo;
     @Override
@@ -62,9 +69,15 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
         log.info("Saving new news {} to the database!", news.getTitle());
 
         List<TopicSubscribed> listSubscriptions = topicSubscribedRepo.findAllByTopicId(news.getTopic().getId());
-        for (int i = 0; i < listSubscriptions.size(); i++) {
-            saveNotification(new Notifications(
-                    "Notícia nova no tópico: " + news.getTopic().getTitle(), false, news, listSubscriptions.get(i).getUser()));
+        for (TopicSubscribed listSubscription : listSubscriptions) {
+            saveNotification(
+                new Notifications(
+                    "Notícia nova no tópico: " + news.getTopic().getTitle(),
+                    false,
+                    news,
+                    listSubscription.getUser()
+                )
+            );
         }
         return newsRepo.save(news);
     }
@@ -181,10 +194,34 @@ public class UserServiceImplementation implements UserService, UserDetailsServic
     public List<TopicSubscribed> getTopicsSubscribedByUser(Long id){
         return topicSubscribedRepo.findAllByUserId(id);
     }
+
     @Override
     public Notifications saveNotification(Notifications notification) {
         log.info("Saving new notification {} to the database!", notification.getMessage());
-        return  notificationsRepo.save(notification);
+        log.info(
+            "Sending new notification {} to the user {} mail!",
+            notification.getMessage(),
+            notification.getUser().getName() + " " + notification.getUser().getSurname()
+        );
+
+        emailSenderService.sendSimpleMessage(
+            notification.getUser().getEmail(),
+            "Correio Privado - A new Article was added",
+            String.format(
+                "Correio Privado\n\n" +
+                "%s %s, there is a new Article available\n" +
+                "%s %s created the new article '%s' on the topic '%s' that you've subscribed!\n\n" +
+                "Go on, go check it!",
+                notification.getUser().getName(),
+                notification.getUser().getSurname(),
+                notification.getNews().getUser().getName(),
+                notification.getNews().getUser().getSurname(),
+                notification.getNews().getTitle(),
+                notification.getNews().getTopic().getTitle()
+            )
+        );
+
+        return notificationsRepo.save(notification);
     }
 
     @Override

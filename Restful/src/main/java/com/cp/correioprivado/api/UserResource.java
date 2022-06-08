@@ -35,36 +35,37 @@ public class UserResource {
     private final RoleRepo roleRepo;
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>>getUsers(){
+    public ResponseEntity<List<User>> getUsers(){
         return ResponseEntity.ok().body(userService.getUsers());
     }
 
     @GetMapping("/roles")
-    public ResponseEntity<List<Role>>getRoles(){
+    public ResponseEntity<List<Role>> getRoles(){
         return ResponseEntity.ok().body(userService.getRoles());
     }
 
     @GetMapping("/topicssubscribed")
-    public ResponseEntity<List<TopicSubscribed>>getTopicsSubscribed(){
+    public ResponseEntity<List<TopicSubscribed>> getTopicsSubscribed(){
         return ResponseEntity.ok().body(userService.getTopicSubscribed());
     }
 
     @GetMapping("/notifications")
-    public ResponseEntity<List<Notifications>>getNotifications(){
+    public ResponseEntity<List<Notifications>> getNotifications(){
         return ResponseEntity.ok().body(userService.getNotifications());
     }
 
     @GetMapping("/topics")
-    public ResponseEntity<List<Topic>>getTopics(){
+    public ResponseEntity<List<Topic>> getTopics(){
         return ResponseEntity.ok().body(userService.getTopics());
     }
+
     @GetMapping("/news")
-    public ResponseEntity<List<News>>getNews(){
+    public ResponseEntity<List<News>> getNews(){
         return ResponseEntity.ok().body(userService.getNews());
     }
 
 //    @PostMapping("/user/save")
-//    public ResponseEntity<User>saveUser(@RequestBody User user){
+//    public ResponseEntity<User> saveUser(@RequestBody User user){
 //        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
 //        return ResponseEntity.created(uri).body(userService.saveUser(user));
 //    }
@@ -83,7 +84,7 @@ public class UserResource {
     }
 
     @GetMapping("/user/getImage")
-    public ResponseEntity<String>getUserImage(@RequestBody String id){
+    public ResponseEntity<String> getUserImage(@RequestBody String id){
         Optional<User> user = userRepo.findById(id);
         if (user.isEmpty())
             return ResponseEntity.ok().body("");
@@ -102,7 +103,7 @@ public class UserResource {
 
 
     @PostMapping("/role/save")
-    public ResponseEntity<Role>saveRole(@RequestBody String title, String description){
+    public ResponseEntity<Role> saveRole(@RequestBody String title, String description){
 
         Role role = new Role(title, description);
 
@@ -111,22 +112,22 @@ public class UserResource {
     }
 
     @GetMapping("/newsByTopic")
-    public ResponseEntity<List<News>>getNewByTopic(@RequestBody String topic){
+    public ResponseEntity<List<News>> getNewByTopic(@RequestBody String topic){
         return ResponseEntity.ok().body(userService.getNewsByTopic(topic));
     }
 
     @GetMapping("/newsByUser")
-    public ResponseEntity<List<News>>getNewByTopic(@RequestBody Long id){
+    public ResponseEntity<List<News>> getNewByTopic(@RequestBody Long id){
         return ResponseEntity.ok().body(userService.getNewsByUser(id));
     }
 
     @GetMapping("/newsById")
-    public ResponseEntity<News>getNewById(@RequestBody Long id){
+    public ResponseEntity<News> getNewById(@RequestBody Long id){
         return ResponseEntity.ok().body(newsRepo.findById(id));
     }
 
     @GetMapping("/newsBetweenDateByTopic")
-    public ResponseEntity<List<News>>getNewsBetweenDatesByTopic(@RequestBody Long topic, Date InitialDate, Date FinalDate){
+    public ResponseEntity<List<News>> getNewsBetweenDatesByTopic(@RequestBody Long topic, Date InitialDate, Date FinalDate){
         List<News> news = newsRepo.findAllByTopicId(topic);
         List<News> selectedNews = null;
         for (News value : news) {
@@ -137,12 +138,12 @@ public class UserResource {
     }
 
     @GetMapping("/userByEmail")
-    public ResponseEntity<User>getUserByEmail(@RequestBody String email){
+    public ResponseEntity<User> getUserByEmail(@RequestBody String email) {
         return ResponseEntity.ok().body(userService.getUserByEmail(email));
     }
 
     @GetMapping("/user/getRole")
-    public ResponseEntity<Role>getRoleByEmail(@RequestBody String email){
+    public ResponseEntity<Role> getRoleByEmail(@RequestBody String email){
         return ResponseEntity.ok().body(userService.getRoleByUser(email));
     }
 
@@ -166,7 +167,7 @@ public class UserResource {
     }
 
     @PostMapping("/topic/save")
-    public ResponseEntity<Topic>saveTopic(@RequestBody String title, String description){
+    public ResponseEntity<Topic> saveTopic(@RequestBody String title, String description){
 
         Topic topic = new Topic(title,description);
 
@@ -175,44 +176,53 @@ public class UserResource {
     }
 
     @DeleteMapping("/topic/remove")
-    public ResponseEntity<String>removeTopic(@RequestBody String title){
+    public ResponseEntity<String> removeTopic(@RequestBody String title){
         userService.removeTopic(title);
         return ResponseEntity.ok(title);
     }
 
     @PostMapping("/topic_subscribed/subscribe")
-    public ResponseEntity<TopicSubscribed>subscribeTopic(@RequestBody TopicSubscribeForm form){
+    public ResponseEntity<TopicSubscribed> subscribeTopic(@RequestBody TopicSubscribeForm form){
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/topic_subscribed/subscribe").toUriString());
         return ResponseEntity.created(uri).body(userService.subscribeTopic(form.getEmail(),form.getTitle()));
     }
 
     @DeleteMapping("/topic_subscribed/unsubscribe")
-    public ResponseEntity<TopicSubscribeForm>removeTopicSubscribed(@RequestBody TopicSubscribeForm form){
+    public ResponseEntity<TopicSubscribeForm> removeTopicSubscribed(@RequestBody TopicSubscribeForm form){
         userService.removeTopicSubscribed(form.getEmail(),form.getTitle());
         return ResponseEntity.ok(form);
     }
 
     @GetMapping("/topic_subscribedByUser")
-    public ResponseEntity<List<TopicSubscribed>>getTopicsSubscribedByUser(@RequestBody Long id){
+    public ResponseEntity<List<TopicSubscribed>> getTopicsSubscribedByUser(@RequestBody Long id){
         return ResponseEntity.ok().body(userService.getTopicsSubscribedByUser(id));
     }
 
     @PostMapping("/notifications/save")
-    public ResponseEntity<Notifications>saveNotifications(@RequestBody String message, long idnews, long iduser){
+    public ResponseEntity<Notifications> saveNotifications(@RequestBody String message, long idnews, long iduser){
 
-        Notifications notification = new Notifications(message,false, newsRepo.findById(idnews), userRepo.findById(iduser));
-        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/notifications/save").toUriString());
+        Notifications notification = new Notifications(
+            message,
+            false,
+            newsRepo.findById(idnews),
+            userRepo.findById(iduser)
+        );
+
+        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath()
+            .path("/api/notifications/save")
+            .toUriString());
+
         return ResponseEntity.created(uri).body(userService.saveNotification(notification));
     }
 
     @DeleteMapping("/notifications/remove")
-    public ResponseEntity<Long>removeNotification(@RequestBody Long id){
+    public ResponseEntity<Long> removeNotification(@RequestBody Long id){
         userService.removeNotification(id);
         return ResponseEntity.ok(id);
     }
 
     @GetMapping("/notificationsByUser")
-    public ResponseEntity<List<Notifications>>getNotificationsByUser(@RequestBody Long id){
+    public ResponseEntity<List<Notifications>> getNotificationsByUser(@RequestBody Long id){
         return ResponseEntity.ok().body(userService.getNotificationsByUser(id));
     }
 }
