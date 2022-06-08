@@ -71,36 +71,13 @@ public class UserResource {
 //    }
 
     @PostMapping("/user/save")
-    public RedirectView saveUser(String name, String surname, String email, String password, String role,
-    @RequestParam("image") MultipartFile multipartFile) throws IOException {
+    public RedirectView saveUser(String name, String surname, String email, String password, String role) throws IOException {
 
         User user = new User(name,surname,email,password,roleRepo.findByName(role));
 
-        if(multipartFile != null)
-            userService.saveUser(user, multipartFile);
-        else
-            userService.saveUser(user);
+        userService.saveUser(user);
         return new RedirectView("/users", true);
     }
-
-    @GetMapping("/user/getImage")
-    public ResponseEntity<String> getUserImage(@RequestBody String id){
-        Optional<User> user = userRepo.findById(id);
-        if (user.isEmpty())
-            return ResponseEntity.ok().body("");
-        else
-            return ResponseEntity.ok().body(user.get().getPhotoImagePath());
-    }
-
-    @GetMapping("/news/getImage")
-    public ResponseEntity<String>getNewsImage(@RequestBody String id){
-        Optional<News> news = newsRepo.findById(id);
-        if (news.isEmpty())
-            return ResponseEntity.ok().body("");
-        else
-            return ResponseEntity.ok().body(news.get().getPhotoImagePath());
-    }
-
 
     @PostMapping("/role/save")
     public ResponseEntity<Role> saveRole(@RequestBody String title, String description){
@@ -112,7 +89,7 @@ public class UserResource {
     }
 
     @GetMapping("/newsByTopic")
-    public ResponseEntity<List<News>> getNewByTopic(@RequestBody String topic){
+    public ResponseEntity<List<News>> getNewByTopic(@RequestParam String topic){
         return ResponseEntity.ok().body(userService.getNewsByTopic(topic));
     }
 
@@ -138,7 +115,7 @@ public class UserResource {
     }
 
     @GetMapping("/userByEmail")
-    public ResponseEntity<User> getUserByEmail(@RequestBody String email) {
+    public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
         return ResponseEntity.ok().body(userService.getUserByEmail(email));
     }
 
@@ -154,16 +131,12 @@ public class UserResource {
 //    }
 
     @PostMapping("/news/save")
-    public RedirectView saveNews(String title, String content, String email, String topic,
-        @RequestParam("image") MultipartFile multipartFile) throws IOException {
+    public RedirectView saveNews(String title, String content, String email, String topic) throws IOException {
 
         News news = new News(title,content,new Date(),userRepo.findByEmail(email),topicRepo.findByTitle(topic));
 
-        if(multipartFile != null)
-                userService.saveNews(news, multipartFile);
-            else
-                userService.saveNews(news);
-            return new RedirectView("/news", true);
+        userService.saveNews(news);
+        return new RedirectView("/news", true);
     }
 
     @PostMapping("/topic/save")
