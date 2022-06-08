@@ -139,7 +139,6 @@ public class UserResource {
     }
 
     @PostMapping("/topic/save")
-    public ResponseEntity<Topic> saveTopic(@RequestBody String title, String description){
     public ResponseEntity<Topic> saveTopic(@RequestBody String title, String description) {
 
         Topic topic = new Topic(title, description);
