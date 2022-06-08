@@ -6,16 +6,21 @@ import com.cp.correioprivado.repo.RoleRepo;
 import com.cp.correioprivado.repo.TopicRepo;
 import com.cp.correioprivado.repo.UserRepo;
 import com.cp.correioprivado.service.UserService;
-
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
-
+import org.aspectj.weaver.ast.Not;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.springframework.web.servlet.view.RedirectView;
 
+import javax.management.Notification;
+import java.io.IOException;
 import java.net.URI;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -30,32 +35,32 @@ public class UserResource {
     private final RoleRepo roleRepo;
 
     @GetMapping("/users")
-    public ResponseEntity<List<User>> getUsers(){
+    public ResponseEntity<List<User>> getUsers() {
         return ResponseEntity.ok().body(userService.getUsers());
     }
 
     @GetMapping("/roles")
-    public ResponseEntity<List<Role>> getRoles(){
+    public ResponseEntity<List<Role>> getRoles() {
         return ResponseEntity.ok().body(userService.getRoles());
     }
 
     @GetMapping("/topicssubscribed")
-    public ResponseEntity<List<TopicSubscribed>> getTopicsSubscribed(){
+    public ResponseEntity<List<TopicSubscribed>> getTopicsSubscribed() {
         return ResponseEntity.ok().body(userService.getTopicSubscribed());
     }
 
     @GetMapping("/notifications")
-    public ResponseEntity<List<Notifications>> getNotifications(){
+    public ResponseEntity<List<Notifications>> getNotifications() {
         return ResponseEntity.ok().body(userService.getNotifications());
     }
 
     @GetMapping("/topics")
-    public ResponseEntity<List<Topic>> getTopics(){
+    public ResponseEntity<List<Topic>> getTopics() {
         return ResponseEntity.ok().body(userService.getTopics());
     }
 
     @GetMapping("/news")
-    public ResponseEntity<List<News>> getNews(){
+    public ResponseEntity<List<News>> getNews() {
         return ResponseEntity.ok().body(userService.getNews());
     }
 
@@ -98,15 +103,15 @@ public class UserResource {
     }
 
     @GetMapping("/newsBetweenDateByTopic")
-    public ResponseEntity<List<News>> getNewsBetweenDatesByTopic(
+    ) {
+        Date FinalDate
+        @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss")
+        @RequestParam
+        Date InitialDate,
+        @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss")
         @RequestParam String topicid,
         @RequestParam
-        @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss")
-        Date InitialDate,
-        @RequestParam
-        @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss")
-        Date FinalDate
-    ) {
+    public ResponseEntity<List<News>> getNewsBetweenDatesByTopic(
         List<News> news = newsRepo.findAllByTopicId(Long.parseLong(topicid));
         List<News> selectedNews = null;
 
@@ -162,7 +167,8 @@ public class UserResource {
     }
 
     @DeleteMapping("/topic_subscribed/unsubscribe")
-    public ResponseEntity<String> removeTopicSubscribed(@RequestParam String email, String title) {
+    public ResponseEntity<String> removeTopicSubscribed(@RequestParam String email,
+                                                        @RequestBody String title) {
         userService.removeTopicSubscribed(email, title);
         return ResponseEntity.ok(title);
     }
