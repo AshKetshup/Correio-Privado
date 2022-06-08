@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -103,17 +104,17 @@ public class UserResource {
     }
 
     @GetMapping("/newsBetweenDateByTopic")
-    ) {
-        Date FinalDate
-        @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss")
-        @RequestParam
-        Date InitialDate,
-        @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss")
+    public ResponseEntity<List<News>> getNewsBetweenDatesByTopic(
         @RequestParam String topicid,
         @RequestParam
-    public ResponseEntity<List<News>> getNewsBetweenDatesByTopic(
+        @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss")
+        Date InitialDate,
+        @RequestParam
+        @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss")
+        Date FinalDate
+    ) {
         List<News> news = newsRepo.findAllByTopicId(Long.parseLong(topicid));
-        List<News> selectedNews = null;
+        List<News> selectedNews = new ArrayList<>();
 
         for (News value : news)
             if (InitialDate.before(value.getReleaseDate()) && FinalDate.after(value.getReleaseDate()))
@@ -139,9 +140,9 @@ public class UserResource {
         @RequestParam String email,
         @RequestParam String topic
     ) {
-
         News news = new News(title, content, new Date(), userRepo.findByEmail(email), topicRepo.findByTitle(topic));
         userService.saveNews(news);
+
         return new RedirectView("/news", true);
     }
 

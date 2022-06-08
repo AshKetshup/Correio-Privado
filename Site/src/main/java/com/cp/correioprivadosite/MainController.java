@@ -152,13 +152,8 @@ public class MainController {
 
         String accessToken = Utils.getCookie(webRequest, ACCESS_TOKEN);
         String userEmail   = Utils.getCookie(webRequest, EMAIL_COOKIE);
-        //TODO: add name and role to top right corner thingy
 
-            }
-
-        }
-
-        
+        // TODO: add name and role to top right corner thingy
 
         return "/index";
     }
