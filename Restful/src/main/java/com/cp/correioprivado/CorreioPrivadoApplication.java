@@ -41,7 +41,7 @@ public class CorreioPrivadoApplication {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
+    /*@Bean
     CommandLineRunner run(UserService userService){
         return args -> {
             userService.saveRole(new Role( "Consumidor","Pode ler as notícias."));
@@ -151,5 +151,5 @@ public class CorreioPrivadoApplication {
 
             // userService.removeTopicSubscribed(userRepo.findByUsername("fernando").getUsername(),topicRepo.findByTitle("Festivais").getTitle());
         };
-    }
+    }*/
 }
