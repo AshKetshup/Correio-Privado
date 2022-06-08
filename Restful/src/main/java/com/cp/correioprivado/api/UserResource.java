@@ -66,7 +66,7 @@ public class UserResource {
     }
 
 //    @PostMapping("/user/save")
-//    public ResponseEntity<User> saveUser(@RequestBody User user){
+//    public ResponseEntity<User>saveUser(@RequestParam User user){
 //        URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/user/save").toUriString());
 //        return ResponseEntity.created(uri).body(userService.saveUser(user));
 //    }
@@ -80,7 +80,7 @@ public class UserResource {
     }
 
     @PostMapping("/role/save")
-    public ResponseEntity<Role> saveRole(@RequestBody String title, String description) {
+    public ResponseEntity<Role> saveRole(@RequestParam String title, String description) {
 
         Role role = new Role(title, description);
 
@@ -89,22 +89,22 @@ public class UserResource {
     }
 
     @GetMapping("/newsByTopic")
-    public ResponseEntity<List<News>> getNewByTopic(@RequestBody String topic) {
+    public ResponseEntity<List<News>> getNewByTopic(@RequestParam String topic) {
         return ResponseEntity.ok().body(userService.getNewsByTopic(topic));
     }
 
     @GetMapping("/newsByUser")
-    public ResponseEntity<List<News>> getNewByUser(@RequestBody String id) {
+    public ResponseEntity<List<News>> getNewByUser(@RequestParam String id) {
         return ResponseEntity.ok().body(userService.getNewsByUser(Long.parseLong(id)));
     }
 
     @GetMapping("/newsById")
-    public ResponseEntity<News> getNewById(@RequestBody String id) {
+    public ResponseEntity<News> getNewById(@RequestParam String id) {
         return ResponseEntity.ok().body(newsRepo.findById(Long.parseLong(id)));
     }
 
     @GetMapping("/newsBetweenDateByTopic")
-    public ResponseEntity<List<News>> getNewsBetweenDatesByTopic(@RequestBody String topicid, @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss") Date InitialDate, @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss") Date FinalDate) {
+    public ResponseEntity<List<News>> getNewsBetweenDatesByTopic(@RequestParam String topicid, @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss") Date InitialDate, @DateTimeFormat(pattern = "yyyy/MM/dd hh:mm:ss") Date FinalDate) {
         List<News> news = newsRepo.findAllByTopicId(Long.parseLong(topicid));
         List<News> selectedNews = null;
         for (News value : news) {
@@ -115,17 +115,17 @@ public class UserResource {
     }
 
     @GetMapping("/userByEmail")
-    public ResponseEntity<User> getUserByEmail(@RequestBody String email) {
+    public ResponseEntity<User> getUserByEmail(@RequestParam String email) {
         return ResponseEntity.ok().body(userService.getUserByEmail(email));
     }
 
     @GetMapping("/user/getRole")
-    public ResponseEntity<Role> getRoleByEmail(@RequestBody String email){
+    public ResponseEntity<Role> getRoleByEmail(@RequestParam String email) {
         return ResponseEntity.ok().body(userService.getRoleByUser(email));
     }
 
 //    @PostMapping("/role/addtouser")
-//    public ResponseEntity<?>saveRole(@RequestBody RoleToUserForm form){
+//    public ResponseEntity<?>saveRole(@RequestParam RoleToUserForm form){
 //        userService.addRoleToUser(form.getUsername(), form.getRoleName());
 //        return ResponseEntity.ok().build();
 //    }
@@ -139,7 +139,7 @@ public class UserResource {
     }
 
     @PostMapping("/topic/save")
-    public ResponseEntity<Topic> saveTopic(@RequestBody String title, String description) {
+    public ResponseEntity<Topic> saveTopic(@RequestParam String title, String description) {
 
         Topic topic = new Topic(title, description);
 
@@ -148,30 +148,30 @@ public class UserResource {
     }
 
     @DeleteMapping("/topic/remove")
-    public ResponseEntity<String> removeTopic(@RequestBody String title) {
+    public ResponseEntity<String> removeTopic(@RequestParam String title) {
         userService.removeTopic(title);
         return ResponseEntity.ok(title);
     }
 
     @PostMapping("/topic_subscribed/subscribe")
-    public ResponseEntity<TopicSubscribed> subscribeTopic(@RequestBody String email, String title) {
+    public ResponseEntity<TopicSubscribed> subscribeTopic(@RequestParam String email, String title) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/topic_subscribed/subscribe").toUriString());
         return ResponseEntity.created(uri).body(userService.subscribeTopic(email, title));
     }
 
     @DeleteMapping("/topic_subscribed/unsubscribe")
-    public ResponseEntity<String> removeTopicSubscribed(@RequestBody String email, String title) {
+    public ResponseEntity<String> removeTopicSubscribed(@RequestParam String email, String title) {
         userService.removeTopicSubscribed(email, title);
         return ResponseEntity.ok(title);
     }
 
     @GetMapping("/topic_subscribedByUser")
-    public ResponseEntity<List<TopicSubscribed>> getTopicsSubscribedByUser(@RequestBody String id) {
+    public ResponseEntity<List<TopicSubscribed>> getTopicsSubscribedByUser(@RequestParam String id) {
         return ResponseEntity.ok().body(userService.getTopicsSubscribedByUser(Long.parseLong(id)));
     }
 
     @PostMapping("/notifications/save")
-    public ResponseEntity<Notifications> saveNotifications(@RequestBody String message, String idnews, String iduser) {
+    public ResponseEntity<Notifications> saveNotifications(@RequestParam String message, String idnews, String iduser) {
 
         Notifications notification = new Notifications(message, false, newsRepo.findById(Long.parseLong(idnews)), userRepo.findById(Long.parseLong(iduser)));
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/notifications/save").toUriString());
@@ -179,13 +179,13 @@ public class UserResource {
     }
 
     @DeleteMapping("/notifications/remove")
-    public ResponseEntity<Long> removeNotification(@RequestBody String id) {
+    public ResponseEntity<Long> removeNotification(@RequestParam String id) {
         userService.removeNotification(Long.parseLong(id));
         return ResponseEntity.ok(Long.parseLong(id));
     }
 
     @GetMapping("/notificationsByUser")
-    public ResponseEntity<List<Notifications>> getNotificationsByUser(@RequestBody String id) {
+    public ResponseEntity<List<Notifications>> getNotificationsByUser(@RequestParam String id) {
         return ResponseEntity.ok().body(userService.getNotificationsByUser(Long.parseLong(id)));
     }
 }
