@@ -5,8 +5,9 @@
     <title>Title</title>
 </head>
 <body>
-    <!-- TODO: thymeleaf everything -->
-    <nav class="navbar navbar-expand-lg navbar-dark shadow-0" style="z-index: 2000;" th:fragment="navbar_logged">
+    <nav th:fragment="navbar" th:replace="${isLogged} ? this :: navbar_logged : this :: navbar_unlogged"></nav>
+
+    <nav th:fragment="navbar_logged" class="navbar navbar-expand-lg navbar-dark shadow-0" style="z-index: 2000;">
         <button id="toggler-button-menu" class="navbar-toggler border-0 my-2 text-light" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample08" aria-controls="navbarsExample08" aria-expanded="false" aria-label="Toggle navigation">
             <i class="fa-solid fa-bars"></i>
         </button>
@@ -25,12 +26,9 @@
             <div id="toggler-icon-navbar" class="dropdown-menu dropdown-menu-end">
                 <!-- TODO: add dynamic link using the User to Profile -->
                 <a class="dropdown-item" th:href="@{/profile}">Profile</a>
-                <!-- TODO: add dynamic link using the User to Logout -->
-                <a class="dropdown-item" href="#">Logout</a>
                 <div class="dropdown-divider"></div>
-                <!-- TODO: add dynamic link using the User to Notifications -->
-                <!-- TODO: if there is Notifications available display the <i></i> th:if="" -->
-                <a class="dropdown-item" href="#">Notifications <i th:if="" class="fa-solid fa-circle-dot text-danger"></i></a>
+                <!-- TODO: add dynamic link using the User to Logout -->
+                <a class="dropdown-item" href="@{/signout}">Logout</a>
             </div>
             <script>
                 let el_button = document.getElementById("toggler-button-menu");
@@ -63,7 +61,7 @@
     </nav>
 
     <div th:fragment="options" class="collapse navbar-collapse col-md-9 text-start" id="navbarsExample08">
-        <a href="" class="col-md-4 mb-2 mb-md-0 text-decoration-none text-light">
+        <a th:href="@{/}" class="col-md-4 mb-2 mb-md-0 text-decoration-none text-light">
             <h5>Correio Privado</h5>
         </a>
 

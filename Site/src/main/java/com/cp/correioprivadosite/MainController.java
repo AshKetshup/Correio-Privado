@@ -1,6 +1,7 @@
 package com.cp.correioprivadosite;
 
 import com.cp.correioprivadosite.dados.*;
+import com.cp.correioprivadosite.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import okhttp3.RequestBody;
@@ -21,19 +22,24 @@ import java.util.*;
 
 @Controller @Slf4j
 public class MainController {
-    private final String restful = "http://localhost:8081";
-    private final String accessToken = "access_token";
-    private final String userNameCookieName = "username";
-    private final String userRoleCookieName = "role";
+    private final static String restful = "http://localhost:8081";
+    private final static String accessToken = "access_token";
+    private final static String userNameCookieName = "username";
+    private final static String userRoleCookieName = "role";
+    public final static String ACCESS_TOKEN = "access_token";
+    public final static String EMAIL_COOKIE = "username";
+    public final static String ROLE_COOKIE = "role";
 
-    public Response queryRESTful (String mediaTypeString,
-                                  String bodyString,
-                                  String uri,
-                                  String method,
-                                  String headerType,
-                                  String headerBody){
-
+    public Response queryRESTful (
+        String mediaTypeString,
+        String bodyString,
+        String uri,
+        String method,
+        String headerType,
+        String headerBody
+    ) {
         OkHttpClient client = new OkHttpClient().newBuilder().build();
+
         MediaType mediaType = MediaType.parse(mediaTypeString);
         RequestBody body = RequestBody.create(mediaType, bodyString);
         Request request = new Request.Builder()
@@ -41,6 +47,7 @@ public class MainController {
                 .method(method, body)
                 .addHeader(headerType, headerBody)
                 .build();
+
         //Receive the response to the the attemped login
         try {
             return client.newCall(request).execute();
@@ -73,31 +80,14 @@ public class MainController {
     public String index(Model model, HttpServletRequest webRequest, HttpServletResponse webResponse){
         //no honest idea what this needs from the server
         log.info("User is in index");
-        Cookie[] userCookies = webRequest.getCookies();
 
-        if(userCookies == null){
-            log.info("No Cookies were found");
-        }else {
-            log.info("Found {} Cookies", userCookies.length);
-            for(int i = 0; i < userCookies.length ; i++){
-                if (userCookies[i].getName() == accessToken){
-                    log.info("Access token found: {}", userCookies[i].getValue());
-                    String accessTokenValue = userCookies[i].getValue();
-                    break;
-                }
-                if (userCookies[i].getName() == userNameCookieName){
-                    log.info("Username found: {}", userCookies[i].getValue());
-                    String username = userCookies[i].getValue();
-                }
-
-            }
-
-        }
-
-        
+        String accessToken = Utils.getCookie(webRequest, ACCESS_TOKEN);
+        String userEmail   = Utils.getCookie(webRequest, EMAIL_COOKIE);
 
         return "/index";
     }
+
+
     //Controller for the login page that sends the login info to the restAPI and then gets back the access token
     @GetMapping(path="/login")
     public String login(Model model,
