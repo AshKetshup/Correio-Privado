@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+    <div th:fragment="profile_btns" th:replace="this :: ${isConsumer} ? consumer_btns : publisher_btns"></div>
+    <div th:fragment="consumer_btns" id="btn_container" class="mb-3 text-end">
+        <a href="topic_create.html" class="btn btn-primary ms-1">Subscribe Topic</a>
+    </div>
+    <div th:fragment="publisher_btns" id="btn_container" class="mb-3 text-end">
+        <a href="topic_create.html" class="btn btn-primary ms-1">New Topic</a>
+        <a href="news_create.html" class="btn btn-primary ms-1">New Article</a>
+    </div>
+
+    <thead th:fragment="profile_thead" th:replace="this :: ${isConsumer} ? consumer_thead : publisher_thead"></thead>
+    <thead th:fragment="publisher_thead" class="bg-light">
+        <tr>
+            <th class="text-start">News</th>
+            <th class="text-start">Topic</th>
+            <th>Date</th>
+            <th></th>
+        </tr>
+    </thead>
+    <thead th:fragment="consumer_thead" class="bg-light">
+        <tr>
+            <th class="text-start">Topic</th>
+            <th class="text-start">News</th>
+            <th>Date</th>
+            <th></th>
+        </tr>
+    </thead>
+
+    <thead th:fragment="profile_tbody" th:replace="this :: ${isConsumer} ? consumer_tbody : publisher_tbody"></thead>
+    <tbody th:fragment="publisher_tbody">
+        <tr>
+            <td>
+                <p class="fw-normal text-start mb-0">How a duck killed Elon Mush</p>
+            </td>
+            <td class="text-start">
+                <p class="fw-normal mb-1">Technology</p>
+                <p class="text-muted mb-0">News about Technology</p>
+            </td>
+            <td>4 days ago</td>
+            <td class="text-end">
+                <button type="button" class="btn btn-link btn-sm btn-rounded">
+                    <i class="fa fa-arrow-right-long"></i>
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p class="fw-normal text-start mb-0">How a duck used a hoe to kill Elon Mush</p>
+            </td>
+            <td class="text-start">
+                <p class="fw-normal mb-1">Gardening</p>
+                <p class="text-muted mb-0">Tips on how to git gud</p>
+            </td>
+            <td>5 days ago</td>
+            <td class="text-end">
+                <button type="button" class="btn btn-link btn-sm btn-rounded">
+                    <i class="fa fa-arrow-right-long"></i>
+                </button>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <p class="fw-normal text-start mb-0">How I killed Elon Mush, the Duck perspective</p>
+            </td>
+            <td class="text-start">
+                <p class="fw-normal mb-1">Literature</p>
+                <p class="text-muted mb-0">News on people who write books</p>
+            </td>
+            <td>9 days ago</td>
+            <td class="text-end">
+                <button type="button" class="btn btn-link btn-sm btn-rounded">
+                    <i class="fa fa-arrow-right-long"></i>
+                </button>
+            </td>
+        </tr>
+    </tbody>
+</body>
+</html>

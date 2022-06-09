@@ -5,6 +5,8 @@ import com.cp.correioprivadosite.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import okhttp3.RequestBody;
+import org.apache.tomcat.util.json.JSONParser;
+import org.apache.tomcat.util.json.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,22 +24,21 @@ import java.util.*;
 
 @Controller @Slf4j
 public class MainController {
-    private final static String restful = "http://localhost:8081";
-    private final static String accessToken = "access_token";
-    private final static String userNameCookieName = "username";
-    private final static String userRoleCookieName = "role";
+    private final static String restful = "http://vmi827195.contaboserver.net:8080";
+    private final static String ROLE_PRODUCER = "Produtor";
+    private final static String ROLE_CONSUMER = "Consumidor";
     public final static String ACCESS_TOKEN = "access_token";
     public final static String EMAIL_COOKIE = "username";
     public final static String ROLE_COOKIE = "role";
 
-    public Response queryRESTful (
+    public Response queryRESTfulPOSTwithToken(
         String mediaTypeString,
         String bodyString,
         String uri,
-        String method,
         String headerType,
-        String headerBody
-    ) {
+        String headerBody,
+        String userToken
+    ){
         OkHttpClient client = new OkHttpClient().newBuilder().build();
 
         MediaType mediaType = MediaType.parse(mediaTypeString);
@@ -56,10 +57,15 @@ public class MainController {
             throw new RuntimeException(e);
         }
     }
-    public Response queryRESTfulPOST (String mediaTypeString, String bodyString, String uri,
-                                      String headerType, String headerBody){
-
+    public Response queryRESTfulPOST(
+        String mediaTypeString,
+        String bodyString,
+        String uri,
+        String headerType,
+        String headerBody
+    ){
         OkHttpClient client = new OkHttpClient().newBuilder().build();
+
         MediaType mediaType = MediaType.parse(mediaTypeString);
         RequestBody body = RequestBody.create(mediaType, bodyString);
         Request request = new Request.Builder()
@@ -67,6 +73,7 @@ public class MainController {
                 .method("POST", body)
                 .addHeader(headerType, headerBody)
                 .build();
+
         //Receive the response to the the attemped login
         try {
             return client.newCall(request).execute();
@@ -75,11 +82,11 @@ public class MainController {
         }
 
     }
+    public Response queryRestfulGETwithToken(
+            String uri,
+            String userToken){
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
 
-    public Response queryRestfulGETwithToken(String uri, String userToken){
-
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
         MediaType mediaType = MediaType.parse("text/plain");
         Request request = new Request.Builder()
                 .url(uri)
@@ -93,24 +100,27 @@ public class MainController {
             throw new RuntimeException(e);
         }
     }
+    public Response queryRestfulGET(
+            String uri){
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
 
-    public Response queryRestfulGETwithToken(String uri){
-        OkHttpClient client = new OkHttpClient().newBuilder()
-                .build();
         MediaType mediaType = MediaType.parse("text/plain");
         Request request = new Request.Builder()
                 .url(uri)
                 .get()
                 .build();
+
         try {
             return client.newCall(request).execute();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
-    public Response queryUserInfo(String userEmail, String userToken){
+    public Response queryUserInfo(
+            String userEmail,
+            String userToken){
 
-        String url = restful+"/api/userByEmail?email="+userEmail;
+        String url = restful + "/api/userByEmail?email="+userEmail;
         log.info("Querying {} for user info", url);
 
         OkHttpClient client = new OkHttpClient().newBuilder()
@@ -128,70 +138,58 @@ public class MainController {
             throw new RuntimeException(e);
         }
     }
-    public String getCookieValue(Cookie[] Cookies, String searchKey) {
-
-        if (Cookies == null) {
-            log.info("No Cookies were found");
-        } else {
-            log.info("Found {} Cookies", Cookies.length);
-            for (int i = 0; i < Cookies.length; i++) {
-                if (Cookies[i].getName() == searchKey) {
-                    log.info("Access token found: {}", Cookies[i].getValue());
-                    return Cookies[i].getValue();
-                }
-            }
-        }
-        return "";
-    }
     //Controller for the main page
     @GetMapping(path="/")
-    public String index(Model model, HttpServletRequest webRequest, HttpServletResponse webResponse){
-        //no honest idea what this needs from the server
+    public String index(
+            Model model,
+            HttpServletRequest webRequest,
+            HttpServletResponse webResponse){
         log.info("User is in index");
-        Cookie[] userCookies = webRequest.getCookies();
 
         String accessToken = Utils.getCookie(webRequest, ACCESS_TOKEN);
         String userEmail   = Utils.getCookie(webRequest, EMAIL_COOKIE);
+
+
+        boolean isLogged = !accessToken.isEmpty();
+        model.addAttribute("isLogged", isLogged);
+
 
         // TODO: add name and role to top right corner thingy
 
         return "/index";
     }
-
-
     //Controller for the login page that sends the login info to the restAPI and then gets back the access token
     @GetMapping(path="/login")
-    public String login(Model model,
-                        HttpServletRequest webRequest,
-                        HttpServletResponse webResponse) {
+    public String login(
+            Model model,
+            HttpServletRequest webRequest,
+            HttpServletResponse webResponse) {
         Cookie[] userCookies = webRequest.getCookies();
         log.info("User is in login");
-        if(userCookies == null){
+
+        // Current User is not logged in
+        if(Utils.getCookie(webRequest, ACCESS_TOKEN).equals("")){
             log.info("No Cookies were found");
-            return "/login";
-        }else {
-            log.info("Found {} Cookies", userCookies.length);
-            for(int i = 0; i < userCookies.length ; i++){
-                if (userCookies[i].getName().equals(accessToken)){
-                    log.info("Access token found: {}", userCookies[i].getValue());
-                    String accessTokenValue = userCookies[i].getValue();
-                    return "redirect:/";
-                }
-                log.info("Cookie {}:{}-> {}", i, userCookies[i].getName(), userCookies[i].getValue());
-            }
-            log.info("No access token was found");
             model.addAttribute("loginInfo", new LoginForm());
+        // Current user has an access token and so is logged in
+        } else {
+            return "redirect:/";
         }
+
         return "/login";
     }
-    @GetMapping(path="/tryLogin")
-    public String tryLogin(Model model,
+    @GetMapping("/tryLogin")
+    public String tryLogin(
+            Model model,
         @RequestParam(required = false) String username,
         @RequestParam(required = false) String password,
-        HttpServletRequest webRequest, HttpServletResponse webResponse) throws IOException, NullPointerException {
+        HttpServletRequest webRequest, HttpServletResponse webResponse
+    ) throws IOException, NullPointerException, ParseException {
 
         final String loginURI = restful + "/login";
         log.info("username is {} and password is {}", username, password);
+
+        log.info("Querying {} with {}", loginURI,"username=" + username + "&password=" + password);
 
         Response response = queryRESTfulPOST("application/x-www-form-urlencoded",
                 "username=" + username + "&password=" + password,
@@ -199,6 +197,7 @@ public class MainController {
                 "Content-Type",
                 "application/x-www-form-urlencoded");
 
+        log.info("response = {}", response);
         if (response.code() == 200){
             log.info("The server responded to the the login attempt with: {}", response);
             //Store the received token in a JSON object
@@ -207,20 +206,17 @@ public class MainController {
 
             //This username is actually the user's email.
             Response userInfo = queryUserInfo(username, token.getString("access_token"));
-            log.info("User info is: {}", userInfo.body().string());
+            String answer = userInfo.body().string();
+            log.info("User info is: {}", answer);
+            JSONObject userJSON = new JSONObject(answer);
 
-            JSONObject userJSON = new JSONObject(userInfo.body().string());
-            log.info("user info  is: {}", userJSON);
+            Cookie userTokenCookie = new Cookie(ACCESS_TOKEN, token.getString("access_token"));
+            Cookie userName = new Cookie(EMAIL_COOKIE, userJSON.get("email").toString());
+            Cookie userRole = new Cookie(ROLE_COOKIE, userJSON.getJSONObject("role").get("name").toString());
 
-            User user = new User(userJSON);
-
-            Cookie userTokenCookie = new Cookie(accessToken, token.getString("access_token"));
-            Cookie userName = new Cookie(userNameCookieName, user.getName()+" "+user.getSurname());
-            Cookie userRole = new Cookie(userRoleCookieName, user.getRole().getName());
-
-            userTokenCookie.setMaxAge(30/*minutes*/ * 60/*seconds*/);
-            userName.setMaxAge(30/*minutes*/ * 60/*seconds*/);
-            userRole.setMaxAge(30/*minutes*/ * 60/*seconds*/);
+            userTokenCookie.setMaxAge(30 * 60);
+            userName.setMaxAge(30 * 60);
+            userRole.setMaxAge(30 * 60);
             webResponse.addCookie(userTokenCookie);
             webResponse.addCookie(userName);
             webResponse.addCookie(userRole);
@@ -231,15 +227,19 @@ public class MainController {
         }
     }
     @GetMapping(path="/news")
-    public String news(Model model, HttpServletRequest webRequest, HttpServletResponse webResponse,
+    public String news(
+            Model model,
+            HttpServletRequest webRequest,
+            HttpServletResponse webResponse,
             @RequestParam(required = false) Long topicID,
             @RequestParam(required = false) @DateTimeFormat(pattern="yyyy/MM/dd") Date startDate,
-            @RequestParam(required = false) @DateTimeFormat(pattern="yyyy/MM/dd") Date endDate) {
+            @RequestParam(required = false) @DateTimeFormat(pattern="yyyy/MM/dd") Date endDate
+    ) {
         log.info("User is in news");
 
-        String userToken = getCookieValue(webRequest.getCookies(), accessToken);
-        String userName  = getCookieValue(webRequest.getCookies(), userNameCookieName);
-        String userRole  = getCookieValue(webRequest.getCookies(), userRoleCookieName);
+        String userToken = Utils.getCookie(webRequest, ACCESS_TOKEN);
+        String userName  = Utils.getCookie(webRequest, EMAIL_COOKIE);
+        String userRole  = Utils.getCookie(webRequest, ROLE_COOKIE);
 
         RestTemplate restTemplate = new RestTemplate();
 
@@ -248,6 +248,8 @@ public class MainController {
 
         final String topicsURI = restful + "/api/topics";
         final String newsURI;
+
+
 
         String uriString = restTemplate.getForObject(topicsURI, String.class);
         JSONArray topics = new JSONArray(uriString);
@@ -271,83 +273,128 @@ public class MainController {
             News article = new News((JSONObject) object);
             listNews.add(article);
         }
-
         Collections.reverse(listNews);
 
         model.addAttribute("ListArticles", listNews);
-        model.addAttribute("ListTopics", listTopics);
-        model.addAttribute("newFilter", new Filter());
+        model.addAttribute("ListTopics"  , listTopics);
+        model.addAttribute("newFilter"   , new Filter());
 
         return "/news";
     }
+
     //Controller that generates a news article and sends it to the restAPI for storage
     @GetMapping(path="/news_create")
-    public String news_create(Model model, HttpServletRequest webRequest,
-                              HttpServletResponse webResponse){
+    public String news_create(
+        Model model,
+        HttpServletRequest webRequest,
+        HttpServletResponse webResponse,
+        @RequestParam(required = false) String title,
+        @RequestParam(required = false) String body,
+        @RequestParam(required = false) String topic
+    ) throws IOException{
         //send POST to server to add news to /api/
         log.info("User is in news_create");
-        String userToken = getCookieValue(webRequest.getCookies(), accessToken);
-        String userName  = getCookieValue(webRequest.getCookies(), userNameCookieName);
-        String userRole  = getCookieValue(webRequest.getCookies(), userRoleCookieName);
+        String userToken = Utils.getCookie(webRequest, ACCESS_TOKEN);
+        String userEmail  = Utils.getCookie(webRequest, EMAIL_COOKIE);
+        String userRole  = Utils.getCookie(webRequest, ROLE_COOKIE);
+
+        //Make sure that only a producer can stay on this page
+        if(!userRole.equals(ROLE_PRODUCER))
+            return "redirect:/";
+
+        //Get Date of when the news was written
+        Date rightNow = new Date();
+
+        //Get User that created the news
+        Response userInfo = queryUserInfo(userEmail, userToken);
+        log.info("User Response: {}", userInfo);
+        String answer = userInfo.body().string();
+        log.info("User info is: {}", answer);
+        JSONObject userJSON = new JSONObject(answer);
+
+        User author = new User(userJSON);
+
+        //Response postNews = queryRESTfulPOSTwithToken();
 
 
         model.addAttribute("newArticle", new News());
 
         return "/news_create";
     }
+
     //Controller that displays the chosen news from /news.html to the user
     @GetMapping(path="/news_viewer")
-    public String news_viewer(Model model, HttpServletRequest webRequest,
-                              HttpServletResponse webResponse) {
+    public String news_viewer(
+        Model model,
+        HttpServletRequest webRequest,
+        HttpServletResponse webResponse,
+        @RequestParam String newsId
+    ) throws IOException {
+        String newsURI = restful + "/api/newsById" + "?id=" + newsId;
+        log.info("Querying Restful at: {}", newsURI);
+
         //query GET to server for news
         log.info("User is in news_viewer");
-        String userToken = getCookieValue(webRequest.getCookies(), accessToken);
-        String userName  = getCookieValue(webRequest.getCookies(), userNameCookieName);
-        String userRole  = getCookieValue(webRequest.getCookies(), userRoleCookieName);
+        String userToken = Utils.getCookie(webRequest, ACCESS_TOKEN);
+        String userName  = Utils.getCookie(webRequest, EMAIL_COOKIE);
+        String userRole  = Utils.getCookie(webRequest, ROLE_COOKIE);
+
+        Response newsResponse = queryRestfulGET(newsURI);
+        log.info("Returned news: {}", newsResponse);
+
+        String answer = newsResponse.body().string();
+        JSONObject newsJSON = new JSONObject(answer);
+        News news = new News(newsJSON);
+
+        model.addAttribute("news", news);
 
         return "/news_viewer.html";
     }
+
     //Controller that gets the user info from the RestAPI and displays it to the user
     @GetMapping(path="/profile")
-    public String profile(Model model, HttpServletRequest webRequest,
-                          HttpServletResponse webResponse) throws JSONException{
+    public String profile(
+        Model model,
+        HttpServletRequest webRequest,
+        HttpServletResponse webResponse
+    ) throws JSONException, RuntimeException, IOException {
         log.info("User is in profile");
-        String userToken = getCookieValue(webRequest.getCookies(), accessToken);
-        String userName  = getCookieValue(webRequest.getCookies(), userNameCookieName);
-        String userRole  = getCookieValue(webRequest.getCookies(), userRoleCookieName);
+        String userToken = Utils.getCookie(webRequest, ACCESS_TOKEN);
+        String userName  = Utils.getCookie(webRequest, EMAIL_COOKIE);
+        String userRole  = Utils.getCookie(webRequest, ROLE_COOKIE);
 
-        //query POST to server to get personal user info back
-        final String profileURI = restful + "/users";
+        Response userProfile = queryUserInfo(userName, userToken);
+        JSONObject userJSON = new JSONObject(userProfile.body().string());
+        User user = new User(userJSON);
 
-        RestTemplate restTemplate = new RestTemplate();
-        Map<String, String> parameters = new HashMap<>();
-        parameters.put("username", "val");
-        parameters.put("password", "val");
+        model.addAttribute("userInfo", user);
 
-        String response = restTemplate.postForObject(profileURI, "",String.class, parameters);
-
-        log.info("User tokens: {}", response);
-
-        JSONObject result = new JSONObject(response.substring(1,response.length()-1));
-
-        return "redirect:/profile";
+        return "/profile";
     }
+
     //Controller that sends a new user to be added to the User Database
-    @GetMapping(path="/register.html")
-    public String register(Model model, HttpServletRequest webRequest,
-                           HttpServletResponse webResponse) {
+    @GetMapping(path="/register")
+    public String register(
+            Model model,
+            HttpServletRequest webRequest,
+            HttpServletResponse webResponse) {
         log.info("User is in register");
         //Does this work?
-
-
         model.addAttribute("registerInfo", new RegisterForm());
-        return "redirect:/register";
+        return "/register.html";
     }
+
     @GetMapping("/registerInfo")
-    public String registerInfo(Model model, HttpServletRequest webRequest, HttpServletResponse webResponse,
-                               @RequestParam int role, @RequestParam String firstname,
-                               @RequestParam String lastname, @RequestParam String email,
-                               @RequestParam String password, @RequestParam String confirmedPassword
+    public String registerInfo(
+        Model model,
+        HttpServletRequest webRequest,
+        HttpServletResponse webResponse,
+        @RequestParam int role,
+        @RequestParam String firstname,
+        @RequestParam String lastname,
+        @RequestParam String email,
+        @RequestParam String password,
+        @RequestParam String confirmedPassword
     ) throws IOException {
         final String registerURI = restful + "/api/user/save";
         log.info("User Details are: {};{};{};{};{};{}",role,firstname,lastname,email,password,confirmedPassword);
@@ -396,7 +443,7 @@ public class MainController {
 
 
 
-                    Cookie userTokenCookie = new Cookie(accessToken, token.getString("access_token"));
+                    Cookie userTokenCookie = new Cookie(ACCESS_TOKEN, token.getString("access_token"));
                     userTokenCookie.setMaxAge(10 * 60); //it's in seconds
 
                     return "redirect:/";
@@ -407,34 +454,58 @@ public class MainController {
     }
     //Controller that displays all topics from the RestAPI
     @GetMapping(path="/topics")
-    public String topics(Model model,
-                         HttpServletRequest webRequest,
-                         HttpServletResponse webResponse) throws IOException{
+    public String topics(
+            Model model,
+            HttpServletRequest webRequest,
+            HttpServletResponse webResponse)
+            throws IOException{
         log.info("User is in topics");
-        String userToken = getCookieValue(webRequest.getCookies(), accessToken);
-        String userName  = getCookieValue(webRequest.getCookies(), userNameCookieName);
-        String userRole  = getCookieValue(webRequest.getCookies(), userRoleCookieName);
+        String userToken = Utils.getCookie(webRequest, ACCESS_TOKEN);
+        String userName  = Utils.getCookie(webRequest, EMAIL_COOKIE);
+        String userRole  = Utils.getCookie(webRequest, ROLE_COOKIE);
 
         //query a GET to the server
         final String topicsURI = restful + "/api/topics";
 
         List<Topic> listTopics = new ArrayList<>();
 
-        Response topics = queryRestfulGETwithToken(topicsURI, userToken);
-
-
-        assert topics.body() != null;
+        Response topics = queryRestfulGET(topicsURI);
         JSONArray topicsJSON = new JSONArray(topics.body().string());
-
         for (var object : topicsJSON) {
             Topic topic = new Topic((JSONObject) object);
             listTopics.add(topic);
         }
-
         log.info("Recieves topics are: {}", listTopics);
+
+        final String newsURI = restful + "/api/news";
+        List<News> listNews = new ArrayList<>();
+        Response newsResponse = queryRestfulGET(newsURI);
+        JSONArray newsJSON = new JSONArray(newsResponse.body().string());
+        for(var object : newsJSON) {
+            News news = new News((JSONObject) object);
+            listNews.add(news);
+        }
+
+
 
         //model.addAttribute("Insert thymeleaf object name here", listTopics);
 
         return "/topics";
+    }
+
+    @GetMapping(path="/signout")
+    public String signout(
+            Model model,
+            HttpServletRequest webRequest,
+            HttpServletResponse webResponse){
+
+        Cookie[] userCookies = webRequest.getCookies();
+
+        for (Cookie c : userCookies){
+            log.info("Deleting cookie {}", c);
+            c.setMaxAge(0);
+            webResponse.addCookie(c);
+        }
+        return "redirect:/";
     }
 }

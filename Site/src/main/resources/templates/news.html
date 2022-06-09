@@ -120,7 +120,7 @@
                                     </div>
                                     <div class="d-flex justify-content-between">
                                         <p class="text-capitalize" th:text="${article.user.name}"></p>
-                                        <a class="btn btn-primary btn-rounded" th:href="@{/news_viewer.html/{id}(id=${article.id})}">Read Article <i class="fas fa-arrow-right"></i></a>
+                                        <a class="btn btn-primary btn-rounded" th:href="@{/news_viewer?(newsId=${article.id})}">Read Article <i class="fas fa-arrow-right"></i></a>
                                     </div>
                                 </div>
                             </div>

@@ -42,7 +42,7 @@
 </head>
 <body>
     <div class="p-5 text-center bg-image" style="
-        background-image: url(&quot;https://images.unsplash.com/photo-1560005490-8ce6d5357ffa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fHRoZW1lfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60&quot;);
+        background-image: url(https://images.unsplash.com/photo-1560005490-8ce6d5357ffa?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MTF8fHRoZW1lfGVufDB8fDB8fA%3D%3D&auto=format&fit=crop&w=500&q=60);
         height: 500px;
         z-index: -1;
         background-size: cover;
@@ -57,7 +57,7 @@
             <nav th:replace="fragments/navbar :: navbar"></nav>
 
             <main class="my-5">
-                <h1 class="text-light fw-bold">How a duck killed Elon Mush</h1>
+                <h1 class="text-light fw-bold" th:text="${news.title} + ' by ' + ${news.user.name} + ' ' + ${news.user.surname}"></h1>
                 <hr class="text-light">
                 <div class="card text-center shadow-5-strong" style="
                     background: hsla(0, 0%, 30%, 0.7);
@@ -71,43 +71,7 @@
                                         width: 100%;
                                     }
                                 </style>
-                                <div id="content">
-                                    # You've been morb'd
-
-                                    It’s Morbin time!
-                                    # FAQ
-
-                                    ### What does this mean?
-                                    It’s time for Morbin.
-
-                                    ---
-                                    ### Why did I do this?
-                                    There are several reasons I may deem you morbin-able to be worthy of being morbed. These include, but are not limited to:
-
-                                    * I am very Morby
-
-                                    * I see you being morbin-able
-
-                                    * You morbed me first
-
-                                    ---
-                                    ### Is Morbius THE movie of all time?
-                                    Yes
-
-                                    ![its morbin time](https://brobible.com/wp-content/uploads/2022/05/its-morbin-time.jpg)
-
-                                    ---
-                                    ### I don't believe I deserved to be morbed upon. Can you un-morb me?
-
-                                    Sure, mistakes happen. But only in exceedingly rare circumstances will I put morb-juice back into my morbenis. If you would like to issue an appeal, shoot me some thick morb-milk explaining what I got wrong. I tend to respond to fucking requests/comments within several minutes. Do note, however, that over 99.9% of people gets morbed, and you are is likely no exception.
-
-                                    ---
-                                    ### How can I prevent this from happening in the future?
-
-                                    Accept the reality that I stick my Morbenis into your morbussy and move on. But learn from this mistake. You were a mistake because I forgot to wear a morbondom whilst fucking your morb-hole. I will continue to morb your morbussy until you improve your conduct.
-
-                                    Remember: morbing you who morbed me first is a right, not a privilege.
-                                </div>
+                                <div id="content" th:text="${news.content}"></div>
                             </div>
                         </div>
                     </div>

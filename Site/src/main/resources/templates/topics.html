@@ -93,9 +93,6 @@
                                 </script>
 
                             </div>
-                            <div class="col-6 text-end">
-                                <a href="" class="btn btn-info text-light">New</a>
-                            </div>
                         </div>
                         <div class="card rounded-5 bg-white bg-opacity-50 shadow-0">
                             <table id="topics_table" class="table align-middle mb-0 bg-white">
@@ -108,6 +105,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
+                                    <!-- TODO -->
+                                    <tr th:each=" : ${lastNews}">
+                                        <td class="text-start">
+                                            <p class="fw-normal mb-1" th:text="${topic.title}">Technology</p>
+                                            <p class="text-muted mb-0" th:text="${topic.description}">News about Technology</p>
+                                        </td>
+                                        <td>
+                                            <p class="fw-normal text-start mb-0">How a duck killed Elon Mush</p>
+                                        </td>
+                                        <td>4 days ago</td>
+                                        <td class="text-end">
+                                            <button type="button" class="btn btn-link btn-sm btn-rounded">
+                                                <i class="fa fa-arrow-right-long"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
                                     <tr>
                                         <td class="text-start">
                                             <p class="fw-normal mb-1">Technology</p>

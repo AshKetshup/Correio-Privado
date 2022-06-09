@@ -17,8 +17,6 @@ public class User {
         this.surname  = obj.getString("surname");
         this.email    = obj.getString("email");
         this.password = obj.getString("password");
-//        this.photo    = obj.getString("photo");
-
         this.role     = new Role(obj.getJSONObject("role"));
     }
 
