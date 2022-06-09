@@ -21,9 +21,7 @@ import org.springframework.web.servlet.view.RedirectView;
 import javax.management.Notification;
 import java.io.IOException;
 import java.net.URI;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @RestController
 @RequestMapping("/api")
@@ -101,6 +99,20 @@ public class UserResource {
     @GetMapping("/newsById")
     public ResponseEntity<News> getNewById(@RequestParam String id) {
         return ResponseEntity.ok().body(newsRepo.findById(Long.parseLong(id)));
+    }
+
+    @GetMapping("/allRecentNews") // Devolve a notícia mais recente de cada tópico.
+    public ResponseEntity<List<News>> getRecentNews(){
+        List<News> newsList = new ArrayList<>();
+        List<Topic> topicList = topicRepo.findAll();
+        List<News> listaAux = new ArrayList<>();
+        for (Topic topic : topicList)
+        {
+            listaAux = newsRepo.findAllByTopicId(topic.getId());
+            listaAux.sort(Comparator.comparing(News::getReleaseDate));
+            newsList.add(listaAux.get(listaAux.size() - 1));
+        }
+        return ResponseEntity.ok().body(newsList);
     }
 
     @GetMapping("/newsBetweenDateByTopic")
