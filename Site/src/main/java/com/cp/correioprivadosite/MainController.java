@@ -5,7 +5,6 @@ import com.cp.correioprivadosite.utils.Utils;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.*;
 import okhttp3.RequestBody;
-import org.apache.tomcat.util.json.JSONParser;
 import org.apache.tomcat.util.json.ParseException;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -172,9 +171,12 @@ public class MainController {
             log.info("No Cookies were found");
             model.addAttribute("loginInfo", new LoginForm());
         // Current user has an access token and so is logged in
+            model.addAttribute("isLogged", true);
         } else {
             return "redirect:/";
         }
+
+
 
         return "/login";
     }
@@ -214,6 +216,8 @@ public class MainController {
             Cookie userName = new Cookie(EMAIL_COOKIE, userJSON.get("email").toString());
             Cookie userRole = new Cookie(ROLE_COOKIE, userJSON.getJSONObject("role").get("name").toString());
 
+            model.addAttribute("isLogged", !userTokenCookie.getValue().isEmpty());
+
             userTokenCookie.setMaxAge(30 * 60);
             userName.setMaxAge(30 * 60);
             userRole.setMaxAge(30 * 60);
@@ -248,6 +252,9 @@ public class MainController {
 
         final String topicsURI = restful + "/api/topics";
         final String newsURI;
+
+        boolean isLogged = !userToken.isEmpty();
+        model.addAttribute("isLogged", isLogged);
 
 
 
@@ -287,11 +294,8 @@ public class MainController {
     public String news_create(
         Model model,
         HttpServletRequest webRequest,
-        HttpServletResponse webResponse,
-        @RequestParam(required = false) String title,
-        @RequestParam(required = false) String body,
-        @RequestParam(required = false) String topic
-    ) throws IOException{
+        HttpServletResponse webResponse
+    ) throws IOException {
         //send POST to server to add news to /api/
         log.info("User is in news_create");
         String userToken = Utils.getCookie(webRequest, ACCESS_TOKEN);
@@ -302,6 +306,9 @@ public class MainController {
         if(!userRole.equals(ROLE_PRODUCER))
             return "redirect:/";
 
+        boolean isLogged = !userToken.isEmpty();
+        model.addAttribute("isLogged", isLogged);
+
         //Get Date of when the news was written
         Date rightNow = new Date();
 
@@ -309,18 +316,60 @@ public class MainController {
         Response userInfo = queryUserInfo(userEmail, userToken);
         log.info("User Response: {}", userInfo);
         String answer = userInfo.body().string();
-        log.info("User info is: {}", answer);
         JSONObject userJSON = new JSONObject(answer);
+
+        Response topicInfo = queryRestfulGET(restful + "/api/topics");
+        String body = topicInfo.body().string();
+        JSONArray topicsJSON = new JSONArray(body);
+        log.info("Topic Array: {}", body);
+
+        List<Topic> topicList = new ArrayList<>();
+        for (var topic : topicsJSON) {
+            topicList.add(new Topic((JSONObject) topic));
+        }
 
         User author = new User(userJSON);
 
-        //Response postNews = queryRESTfulPOSTwithToken();
-
-
-        model.addAttribute("newArticle", new News());
+        model.addAttribute("newArticle", new CreateNews());
+        model.addAttribute("listTopics", topicList);
 
         return "/news_create";
     }
+
+    @GetMapping("/sendNews")
+    public String sendNews(
+        @RequestParam String title,
+        @RequestParam String content,
+        @RequestParam String topic_title,
+        HttpServletRequest webRequest,
+        HttpServletResponse webResponse
+    ) {
+        log.info("User is in news_create");
+        String userToken = Utils.getCookie(webRequest, ACCESS_TOKEN);
+        String userEmail  = Utils.getCookie(webRequest, EMAIL_COOKIE);
+        String userRole  = Utils.getCookie(webRequest, ROLE_COOKIE);
+
+        Response response = queryRESTfulPOSTwithToken(
+            "application/x-www-form-urlencoded",
+            String.format(
+                "title=%s&content=%semail=%stopic=%s",
+                title,
+                content,
+                userEmail,
+                topic_title
+            ),
+            restful + "/api/news/save",
+            "Content-Type",
+            "application/x-www-form-urlencoded",
+            userToken
+        );
+
+        log.info("Save news: {}", response);
+
+        return "redirect:/profile";
+    }
+
+
 
     //Controller that displays the chosen news from /news.html to the user
     @GetMapping(path="/news_viewer")
@@ -338,6 +387,8 @@ public class MainController {
         String userToken = Utils.getCookie(webRequest, ACCESS_TOKEN);
         String userName  = Utils.getCookie(webRequest, EMAIL_COOKIE);
         String userRole  = Utils.getCookie(webRequest, ROLE_COOKIE);
+
+        model.addAttribute("isLogged", !userToken.isEmpty());
 
         Response newsResponse = queryRestfulGET(newsURI);
         log.info("Returned news: {}", newsResponse);
@@ -357,7 +408,7 @@ public class MainController {
         Model model,
         HttpServletRequest webRequest,
         HttpServletResponse webResponse
-    ) throws JSONException, RuntimeException, IOException {
+    ) throws JSONException, RuntimeException, IOException, java.text.ParseException {
         log.info("User is in profile");
         String userToken = Utils.getCookie(webRequest, ACCESS_TOKEN);
         String userName  = Utils.getCookie(webRequest, EMAIL_COOKIE);
@@ -367,9 +418,53 @@ public class MainController {
         JSONObject userJSON = new JSONObject(userProfile.body().string());
         User user = new User(userJSON);
 
-        model.addAttribute("userInfo", user);
+        model.addAttribute("isLogged", !userToken.isEmpty());
 
-        return "/profile";
+        model.addAttribute("user_name", user.getName());
+        model.addAttribute("user_mail", user.getEmail());
+        model.addAttribute("user_role", user.getRole().getName());
+
+        boolean isConsumer = user.getRole().getId() == 1;
+        model.addAttribute("isConsumer", isConsumer);
+
+        String uri = "";
+
+        if (isConsumer) {
+            uri = restful + "/api/topic_subscribedByUser?id=" + user.getId();
+            List<Topic> listTopics = new ArrayList<>();
+
+            Response topics = queryRestfulGET(uri);
+            String body = topics.body().string();
+            JSONArray topicsJSON = new JSONArray(body);
+
+            log.info("Body {}", body);
+
+            for (var object : topicsJSON) {
+                TopicSubscribed topicSubscribed = new TopicSubscribed((JSONObject) object);
+                listTopics.add(topicSubscribed.getTopic());
+            }
+
+            log.info("Recieves topics are: {}", listTopics);
+
+
+            model.addAttribute("userSubTopics", listTopics);
+        } else {
+            uri = restful + "/api/newsByUser?id=" + user.getId();
+            List<News> listNews = new ArrayList<>();
+
+            Response news = queryRestfulGET(uri);
+            JSONArray newsJSON = new JSONArray(news.body().string());
+
+            for (var object : newsJSON) {
+                News article = new News((JSONObject) object);
+                listNews.add(article);
+            }
+
+            log.info("Recieves topics are: {}", listNews);
+            model.addAttribute("userArticles", listNews);
+        }
+
+        return "/profile.html";
     }
 
     //Controller that sends a new user to be added to the User Database
@@ -379,6 +474,14 @@ public class MainController {
             HttpServletRequest webRequest,
             HttpServletResponse webResponse) {
         log.info("User is in register");
+
+        String userToken = Utils.getCookie(webRequest, ACCESS_TOKEN);
+        String userName  = Utils.getCookie(webRequest, EMAIL_COOKIE);
+        String userRole  = Utils.getCookie(webRequest, ROLE_COOKIE);
+
+        boolean isLogged = !userToken.isEmpty();
+        model.addAttribute("isLogged", isLogged);
+
         //Does this work?
         model.addAttribute("registerInfo", new RegisterForm());
         return "/register.html";
@@ -465,32 +568,47 @@ public class MainController {
         String userRole  = Utils.getCookie(webRequest, ROLE_COOKIE);
 
         //query a GET to the server
-        final String topicsURI = restful + "/api/topics";
+        final String topicsURI = restful + "/api/allRecentNews";
 
-        List<Topic> listTopics = new ArrayList<>();
+        boolean isLogged = !userToken.isEmpty();
+        model.addAttribute("isLogged", isLogged);
+
+        List<News> listNews = new ArrayList<>();
 
         Response topics = queryRestfulGET(topicsURI);
-        JSONArray topicsJSON = new JSONArray(topics.body().string());
+        String body = topics.body().string();
+        log.info("topics.body().string() " + body);
+        JSONArray topicsJSON = new JSONArray(body);
         for (var object : topicsJSON) {
-            Topic topic = new Topic((JSONObject) object);
-            listTopics.add(topic);
+            News article = new News((JSONObject) object);
+            listNews.add(article);
         }
-        log.info("Recieves topics are: {}", listTopics);
+        log.info("Recieves topics are: {}", listNews);
 
-        final String newsURI = restful + "/api/news";
-        List<News> listNews = new ArrayList<>();
-        Response newsResponse = queryRestfulGET(newsURI);
-        JSONArray newsJSON = new JSONArray(newsResponse.body().string());
-        for(var object : newsJSON) {
-            News news = new News((JSONObject) object);
-            listNews.add(news);
+        model.addAttribute("lastArticle", listNews);
+
+        return "/topics.html";
+    }
+
+    @GetMapping(path="/topic_unsub")
+    public String topic_unsub(
+        @RequestParam String userMail,
+        @RequestParam String topicTitle
+    ) {
+        String uri = restful + "/api/topic_subscribed/unsubscribe" +
+            "?email=" + userMail + "&title=" + topicTitle;
+
+        MediaType mediaType = MediaType.parse("text/plain");
+        Request request = new Request.Builder().url(uri).delete().build();
+
+        OkHttpClient client = new OkHttpClient().newBuilder().build();
+        try {
+            client.newCall(request).execute();
+        } catch (IOException e) {
+            log.error(e.getMessage());
         }
 
-
-
-        //model.addAttribute("Insert thymeleaf object name here", listTopics);
-
-        return "/topics";
+        return "redirect:/profile";
     }
 
     @GetMapping(path="/signout")

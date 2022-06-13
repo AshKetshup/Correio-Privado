@@ -22,6 +22,7 @@ import java.net.URI;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -135,10 +136,10 @@ public class UserResource {
 
     @PostMapping("/news/save")
     public RedirectView saveNews(
-        @RequestParam String title,
-        @RequestParam String content,
-        @RequestParam String email,
-        @RequestParam String topic
+        @RequestBody String title,
+        @RequestBody String content,
+        @RequestBody String email,
+        @RequestBody String topic
     ) {
         News news = new News(title, content, new Date(), userRepo.findByEmail(email), topicRepo.findByTitle(topic));
         userService.saveNews(news);
@@ -147,7 +148,7 @@ public class UserResource {
     }
 
     @PostMapping("/topic/save")
-    public ResponseEntity<Topic> saveTopic(@RequestParam String title, @RequestParam String description) {
+    public ResponseEntity<Topic> saveTopic(@RequestBody String title, @RequestBody String description) {
 
         Topic topic = new Topic(title, description);
 
@@ -168,8 +169,10 @@ public class UserResource {
     }
 
     @DeleteMapping("/topic_subscribed/unsubscribe")
-    public ResponseEntity<String> removeTopicSubscribed(@RequestParam String email,
-                                                        @RequestBody String title) {
+    public ResponseEntity<String> removeTopicSubscribed(
+        @RequestParam String email,
+        @RequestParam String title
+    ) {
         userService.removeTopicSubscribed(email, title);
         return ResponseEntity.ok(title);
     }
@@ -177,6 +180,22 @@ public class UserResource {
     @GetMapping("/topic_subscribedByUser")
     public ResponseEntity<List<TopicSubscribed>> getTopicsSubscribedByUser(@RequestParam String id) {
         return ResponseEntity.ok().body(userService.getTopicsSubscribedByUser(Long.parseLong(id)));
+    }
+
+    // Devolve a notícia mais recente de cada tópico.
+    @GetMapping("/allRecentNews")
+    public ResponseEntity<List<News>> getRecentNews(){
+        List<News> newsList = new ArrayList<>();
+        List<Topic> topicList = topicRepo.findAll();
+        List<News> listaAux;
+
+        for (Topic topic : topicList) {
+            listaAux = newsRepo.findAllByTopicId(topic.getId());
+            listaAux.sort(Comparator.comparing(News::getReleaseDate));
+            newsList.add(listaAux.get(listaAux.size() - 1));
+        }
+
+        return ResponseEntity.ok().body(newsList);
     }
 
     @PostMapping("/notifications/save")

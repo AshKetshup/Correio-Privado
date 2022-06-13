@@ -106,17 +106,17 @@
                                 </thead>
                                 <tbody>
                                     <!-- TODO -->
-                                    <tr th:each=" : ${lastNews}">
+                                    <tr th:each="article : ${lastArticle}">
                                         <td class="text-start">
-                                            <p class="fw-normal mb-1" th:text="${topic.title}">Technology</p>
-                                            <p class="text-muted mb-0" th:text="${topic.description}">News about Technology</p>
+                                            <p class="fw-normal mb-1" th:text="${article.topic.title}"></p>
+                                            <p class="text-muted mb-0" th:text="${article.topic.description}"></p>
                                         </td>
                                         <td>
-                                            <p class="fw-normal text-start mb-0">How a duck killed Elon Mush</p>
+                                            <p class="fw-normal text-start mb-0" th:text="${article.title}">How a duck killed Elon Mush</p>
                                         </td>
                                         <td>4 days ago</td>
                                         <td class="text-end">
-                                            <button type="button" class="btn btn-link btn-sm btn-rounded">
+                                            <button th:href="@{/news_viewer?(newsId=${article.id})}" type="button" class="btn btn-link btn-sm btn-rounded">
                                                 <i class="fa fa-arrow-right-long"></i>
                                             </button>
                                         </td>
